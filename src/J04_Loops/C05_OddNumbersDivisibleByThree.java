@@ -1,4 +1,4 @@
-package J03_Loops;
+package J04_Loops;
 // Print all odd numbers divisible by 3 from 1 to 100.
 public class C05_OddNumbersDivisibleByThree {
     public static void main(String[] args) {

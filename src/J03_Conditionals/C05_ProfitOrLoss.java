@@ -1,4 +1,4 @@
-package J02_Conditionals;
+package J03_Conditionals;
 import java.util.Scanner;
 /*
 * Ques: If cost price and selling price of an

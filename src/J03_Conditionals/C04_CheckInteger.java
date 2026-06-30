@@ -1,4 +1,4 @@
-package J02_Conditionals;
+package J03_Conditionals;
 import java.util.Scanner;
 public class C04_CheckInteger {
     public static void main(String[] args) {

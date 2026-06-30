@@ -1,4 +1,4 @@
-package J02_Conditionals;
+package J03_Conditionals;
 import java.util.Scanner;
 
 // Ques. Take three positive integers input and print the greatest of them.

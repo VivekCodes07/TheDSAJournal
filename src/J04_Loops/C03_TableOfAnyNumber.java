@@ -1,4 +1,4 @@
-package J03_Loops;
+package J04_Loops;
 import java.util.Scanner;
 public class C03_TableOfAnyNumber {
     public static void main(String[] args) {

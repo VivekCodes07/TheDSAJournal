@@ -1,4 +1,4 @@
-package J02_Conditionals;
+package J03_Conditionals;
 import java.util.Scanner;
 // Take three positive integers and tell if they can be sides of a triangle.
 public class C09_TriangleExistence {

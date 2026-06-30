@@ -1,4 +1,4 @@
-package J03_Loops;
+package J04_Loops;
 // Print 1 to 10
 public class C01_ForLoop {
     public static void main(String[] args) {
