@@ -1,4 +1,4 @@
-# TheDSAJournals
+# TheDSAJournal
 
 > This is just my space where I’m trying to actually understand DSA properly instead of blindly solving problems.
 
