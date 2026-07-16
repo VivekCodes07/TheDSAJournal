@@ -1,0 +1,17 @@
+package J05_PatternPrinting;
+import java.util.Scanner;
+public class C02_Square {
+    public static void main(String args[]) {
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Enter the size of square you want: ");
+        int size = sc.nextInt();
+
+        for (int i = 1; i <= size; i++) {
+            for (int j = 1; j<= size; j++) {
+                System.out.print("* ");
+            }
+            System.out.println();
+        }
+        sc.close();
+    }
+}
