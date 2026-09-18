@@ -1,262 +1,184 @@
 # TheDSAJournal
 
-> This is just my space where I’m trying to actually understand DSA properly instead of blindly solving problems.
+My personal journey of learning **Data Structures & Algorithms with Java**.
+
+I'm building this repository as I learn — writing code, understanding concepts, solving problems, getting confused, fixing those confusions, and slowly getting better.
+
+The goal isn't to just finish a course or memorize solutions.
+
+**I want to understand what I'm writing and eventually solve problems on my own.**
 
 ---
 
-## What this is about
+## Course I'm Following
 
-So basically, this repo is me following a structured DSA roadmap and writing things in my own way.
+### GeeksforGeeks — Data Structures & Algorithms
 
-I’m not trying to make it perfect or super formal.  
-I’m just trying to make sure I actually *get it*.
+**Instructor:** Raghav Sir
+**Platform:** GeeksforGeeks
 
-Every topic here has:
-- My own understanding (not copied definitions)
-- Java code for practice
-- Problems I solved (and sometimes struggled with)
-- Small notes on what I learned or messed up
+[Course Playlist](https://youtube.com/playlist?list=PLqM7alHXFySGwOTADxwHrgH8m_XpgrB-k&si=pLnES7fOAb_UvIff)
+
+This course gives me the structure for learning DSA, while **TheDSAJournal is where I write and practice what I learn.**
 
 ---
 
-## How I think about DSA
+## How I Learn
 
-In simple words:
+I study each topic from the course and use **ChatGPT alongside it** whenever I need to understand something better.
 
-- Data Structures = how data is stored and organized
-- Algorithms = how we use that data to solve problems
+My usual flow is:
 
-Or even simpler:
+```text
+Learn the Concept
+       ↓
+Understand WHY it works
+       ↓
+Study & clear doubts with ChatGPT
+       ↓
+Implement it in Java
+       ↓
+Dry Run the Code
+       ↓
+Understand Time & Space Complexity
+       ↓
+Solve Problems
+       ↓
+Try to Rebuild It Without Looking
+```
 
-Data Structures = structure  
-Algorithms = thinking
+I use ChatGPT to break down confusing concepts, understand code, dry-run logic, compare approaches, and clear doubts.
 
-Both together = solving problems without losing your mind
-
----
-
-## Roadmap I’m following
-
-I’m following a fixed order so I don’t randomly jump around topics and get confused.
-
----
-
-## 1. Java Fundamentals
-
-This is where everything starts.
-
-What I cover:
-- Variables, data types, operators
-- Loops and conditions
-- Functions / methods
-- Arrays (1D and 2D)
-- Strings and StringBuilder
-- Basic time and space complexity
-
-Goal:
-Just get comfortable writing code without thinking too much about syntax.
+The goal is to **learn with AI, not depend on AI.**
 
 ---
 
-## 2. Object-Oriented Programming (OOP)
+## Repository Structure
 
-This is about writing code in a structured way.
+Currently, I'm building my Java foundation before going deeper into DSA.
 
-Topics:
-- Classes and objects
-- Constructors
-- Inheritance
-- Polymorphism
-- Encapsulation
-- Abstraction
-- Interfaces
-- Exception handling
+```text
+TheDSAJournal/
+│
+├── src/
+│   ├── J01_Basics/
+│   ├── J02_Operators/
+│   ├── J03_Conditionals/
+│   ├── J04_Loops/
+│   ├── J05_PatternPrinting/
+│   ├── J06_Methods/
+│   ├── J07_Arrays/
+│   └── J08_ObjectOrientedProgramming/
+│
+├── .gitignore
+├── README.md
+└── TheDSAJournal.iml
+```
 
-Goal:
-Understand how real programs are actually designed.
-
----
-
-## 3. Recursion and Backtracking
-
-This is where things start feeling a bit tricky.
-
-Topics:
-- Basic recursion
-- Recursion tree idea
-- Backtracking problems like:
-    - Subsets
-    - N-Queens
-    - Sudoku
-    - Factorial / Fibonacci
-
-Goal:
-Get used to solving problems by exploring all possibilities.
+The structure will keep growing as I learn.
 
 ---
 
-## 4. Basic Data Structures
+## My Problem-Solving Approach
 
-This is where patterns start showing up.
+When I get a problem, I try not to immediately look for the solution.
 
-Topics:
-- Arrays (prefix sum, sliding window, two pointers)
-- Strings (palindromes, anagrams, patterns)
-- Hashing (HashMap, HashSet, frequency tricks)
+```text
+Understand the Problem
+        ↓
+Think of a Brute Force Approach
+        ↓
+Check the Constraints
+        ↓
+Find a Better Approach
+        ↓
+Write the Code
+        ↓
+Dry Run
+        ↓
+Analyze Complexity
+        ↓
+Try Again Without Looking
+```
 
-Goal:
-Start recognizing common problem patterns instead of solving from scratch every time.
+I don't want to remember:
 
----
+> "This is the code for this problem."
 
-## 5. Linked Lists
+I want to understand:
 
-Pointer-based stuff starts here.
-
-Topics:
-- Singly, doubly, circular linked list
-- Reverse linked list
-- Detect cycle
-- Middle of linked list
-- Merge lists
-
-Goal:
-Get comfortable with pointers and node-based thinking.
-
----
-
-## 6. Stack and Queue
-
-Simple rules, useful problems.
-
-Topics:
-- Stack (NGE, balanced brackets, monotonic stack)
-- Queue (circular queue, deque)
-- Sliding window max
-
-Goal:
-Learn how constraints like LIFO/FIFO actually help in solving problems.
+> **"How do I think about this problem?"**
 
 ---
 
-## 7. Trees
+## When Do I Consider Something Learned?
 
-One of the most important topics.
+Watching a lecture or understanding someone else's code isn't enough.
 
-Topics:
-- Binary trees
-- Traversals (pre, in, post, level order)
-- BST
-- Diameter, LCA, balanced tree
+For me, a topic is learned when I can:
 
-Goal:
-Understand recursive structures properly.
+* Explain it in my own words
+* Understand why it works
+* Write the implementation myself
+* Dry-run it
+* Understand its time and space complexity
+* Modify the approach
+* Solve related problems without blindly copying
 
----
-
-## 8. Heap and Priority Queue
-
-For priority-based problems.
-
-Topics:
-- Min heap / Max heap
-- Priority queue in Java
-- K largest elements
-- Top K frequent elements
-- Merge K sorted arrays
-
-Goal:
-Learn how to efficiently handle “top K” type problems.
+**If I can rebuild it from scratch, I consider it learned.**
 
 ---
 
-## 9. Binary Search
+## Learning Roadmap
 
-Simple but powerful.
+### Java Foundation
 
-Topics:
-- Basic binary search
-- Search on answer
-- Lower/upper bound
-- Rotated arrays
+* Basics
+* Operators
+* Conditionals
+* Loops
+* Pattern Printing
+* Methods
+* Arrays
+* Object-Oriented Programming
 
-Goal:
-Learn how to reduce search space instead of brute forcing.
+### Core DSA
 
----
+* Recursion & Backtracking
+* Searching & Sorting
+* Linked Lists
+* Stack & Queue
+* Hashing
+* Trees
+* Heap & Priority Queue
+* Graphs
+* Greedy Algorithms
+* Dynamic Programming
 
-## 10. Graphs
+### Advanced Topics
 
-Things start getting more real-world here.
+* Tries
+* Segment Trees
+* Fenwick Trees
+* Bit Manipulation
+* Advanced Graph Algorithms
+* Other interview-focused topics
 
-Topics:
-- BFS and DFS
-- Adjacency list/matrix
-- Connected components
-- Topological sort
-- Dijkstra
-- DSU (Union Find)
-- MST
-
-Goal:
-Learn how to represent and solve connected systems.
-
----
-
-## 11. Greedy Algorithms
-
-Making decisions step by step.
-
-Topics:
-- Activity selection
-- Job sequencing
-- Fractional knapsack
-- Interval problems
-
-Goal:
-Understand when local best choice actually works globally.
+The roadmap will evolve as I progress and understand what I actually need to learn.
 
 ---
 
-## 12. Dynamic Programming
+## My Rule
 
-The “pain but powerful” section.
+```text
+Understanding > Speed
+Consistency > Motivation
+Problem Solving > Memorization
+Depth > Completion
+```
 
-Topics:
-- Memoization
-- Tabulation
-- 1D / 2D DP
-- Subsequence problems
-- Knapsack variations
-- DP on trees
+I'm not trying to build a perfect DSA repository.
 
-Goal:
-Stop getting scared of recursion + optimization problems.
+I'm building a record of **my actual learning journey** — the code I write, the problems I struggle with, the mistakes I make, and the concepts I eventually understand.
 
----
-
-## 13. Advanced Topics (ongoing)
-
-Not fully done yet, still learning this part.
-
-Topics:
-- Tries
-- Segment trees
-- Fenwick tree
-- Bit manipulation
-- KMP
-- Advanced DSU
-- Advanced graphs
-
-Goal:
-Just get comfortable with advanced interview/CP level problems.
-
----
-
-## Final note
-
-I’m not trying to rush this.
-
-The goal is simple: understand things properly so I can solve problems without depending on memorization.
-
-If I can rebuild everything from scratch, I consider it learned.
+**One topic at a time.**
