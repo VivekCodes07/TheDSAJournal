@@ -1,34 +1,57 @@
-# L11 — AutoBoxing and POJOs
+# L11 — Wrapper Classes, AutoBoxing and POJOs
 
-## Why am I learning this?
+# Why am I learning this?
 
-Until now, I've mostly worked with primitive types, objects, classes, inheritance, and other OOP concepts.
+While learning Java, I've already worked with primitive types, objects, classes, inheritance, interfaces, and other OOP concepts.
 
-But Java has a few things happening behind the scenes that are important to understand.
+But there are still some behaviours that I need to understand properly.
 
 For example:
 
-- Why can I store an `int` inside an `ArrayList<Integer>`?
-- What exactly happens when Java converts an `int` into an `Integer`?
-- Why can comparing two `Integer` objects with `==` sometimes give `true` and sometimes `false`?
-- Why does unboxing a `null` value throw a `NullPointerException`?
-- What is a POJO, and why do backend frameworks use these classes so much?
+- Why do Java Collections require wrapper classes like `Integer` instead of allowing primitive types like `int` as generic type arguments? How does autoboxing allow us to add primitive values to an `ArrayList<Integer>`?
+- What actually happens when I assign an `int` to an `Integer`?
+- Why does assigning one object reference to another sometimes make both variables point to the same object?
+- Why can comparing two `Integer` objects with `==` give different results?
+- Why does converting a `null` Integer into an `int` cause an exception?
+- What are POJOs, and why are they so common in backend development?
+- Why does Java care about public class names and filenames?
 
-I don't want to just memorize these behaviours. I want to understand what Java is doing with values, references, and objects.
+I don't want to learn these as separate definitions.
 
-That's what this lesson is about.
+I want to understand what Java is doing internally, how values and references behave, and why these features exist in the first place.
+
+# What am I going to study in this lesson?
+
+I've divided this lesson into eight parts. Each part builds on the concepts from the previous one, so I don't have to learn anything without understanding its foundation first.
+
+| Part | What I'll study | Why it matters |
+|---|---|---|
+| 01 — The Foundation | Primitive Types vs Reference Types | Understand how values, references and objects behave in memory |
+| 02 — Wrapper Classes | Why Wrapper Classes exist and all 8 Wrapper Classes | Understand how primitive values can be represented as objects |
+| 03 — Boxing and Unboxing | Boxing, Unboxing, AutoBoxing and AutoUnboxing | Understand how Java converts between primitives and wrapper objects |
+| 04 — Collections and Generics | AutoBoxing with Collections and Generics | Understand why collections use wrapper types instead of primitives |
+| 05 — Integer Internals | NullPointerException during unboxing, `==` vs `.equals()`, Integer methods and Integer Caching | Understand the behaviour of wrapper objects and avoid common mistakes |
+| 06 — OOP Revision | Abstract Class revision and interview questions | Strengthen my understanding of abstract classes |
+| 07 — Practical Java | POJO Classes and their use in frameworks | Understand how Java represents application data, especially in backend development |
+| 08 — Java Source Files | Top-level classes, public classes, filenames, compilation and class loading | Understand how Java source files are organised and compiled internally |
+
+By the end, I should be able to explain not just what these features do, but also why Java needs them and what happens behind the scenes.
 
 ---
 
-# Part 1 — Understanding Primitive and Reference Types
+# PART 1 — The Foundation: Values, References and Objects
+
+Before learning Wrapper Classes, I need to understand one important distinction.
+
+Java has primitive types and reference types.
+
+This distinction is the foundation of almost everything in this lesson.
 
 ## 1. Primitive Types vs Reference Types
 
-Before understanding Wrapper Classes, I need to be completely clear about the difference between primitive and reference types.
+Java provides 8 primitive types:
 
-Java has 8 primitive types:
-
-| Primitive Type | Example |
+| Primitive | Example |
 |---|---|
 | `byte` | `byte age = 20;` |
 | `short` | `short number = 100;` |
@@ -39,74 +62,82 @@ Java has 8 primitive types:
 | `char` | `char grade = 'A';` |
 | `boolean` | `boolean isPassed = true;` |
 
-These types store simple values.
+These are the only primitive types in Java.
 
-Reference types include:
+Everything else, such as classes, arrays, interfaces, Strings, and enums, is a reference type.
 
-- Classes
-- Objects
-- Arrays
-- Interfaces
-- Strings
-- Enums
+### First, understand primitive variables
 
-The important difference is what the variable represents.
-
-### Primitive variables
-
-A primitive variable holds its actual value.
+Consider:
 
 ```java
-int a = 10;
-int b = a;
+public class Main {
 
-b = 20;
+    public static void main(String[] args) {
 
-System.out.println(a);
-System.out.println(b);
+        int a = 10;
+        int b = a;
+
+        b = 50;
+
+        System.out.println(a);
+        System.out.println(b);
+    }
+}
 ```
 
 Output:
 
 ```text
 10
-20
+50
 ```
 
-When I write `int b = a`, Java copies the value of `a` into `b`.
+Why didn't changing `b` affect `a`?
 
-Both variables have their own independent values.
+Because when I wrote:
+
+```java
+int b = a;
+```
+
+Java copied the value of `a` into `b`.
+
+Both variables have independent values.
 
 ### Memory perspective
 
 ```text
-              STACK
-       ┌───────────────────┐
-       │ Variable: a       │
-       │ Value: 10         │
-       ├───────────────────┤
-       │ Variable: b       │
-       │ Value: 20         │
-       └───────────────────┘
+                  STACK
+        ┌───────────────────────┐
+        │ main() Stack Frame    │
+        ├───────────────────────┤
+        │                       │
+        │  a = 10               │
+        │                       │
+        │  b = 50               │
+        │                       │
+        └───────────────────────┘
 
-       Two independent values
+        Two independent primitive values.
 ```
 
-Changing `b` does not change `a`.
+### Now understand reference variables
 
-### Reference variables
-
-Now consider an object.
+Consider:
 
 ```java
 class Student {
+
     String name;
 }
 
 public class Main {
+
     public static void main(String[] args) {
 
         Student s1 = new Student();
+
         s1.name = "Vivek";
 
         Student s2 = s1;
@@ -126,9 +157,11 @@ Rahul
 Rahul
 ```
 
-Why did changing `s2.name` also affect what I see through `s1`?
+This time, changing something through `s2` also affects what I see through `s1`.
 
-Because `s1` and `s2` refer to the same object.
+Why?
+
+Because both variables refer to the same Student object.
 
 When I write:
 
@@ -136,51 +169,60 @@ When I write:
 Student s2 = s1;
 ```
 
-Java copies the reference, not the entire object.
+Java copies the reference held by `s1`.
+
+It does not create another Student object.
 
 ### Memory perspective
 
 ```text
-                 STACK                         HEAP
-       ┌────────────────────┐
-       │ s1                 │
-       │ Reference ─────────┼──────────────┐
-       ├────────────────────┤              │
-       │ s2                 │              │
-       │ Reference ─────────┼──────────┐   │
-       └────────────────────┘          │   │
-                                       ▼   ▼
-                                  ┌──────────────┐
-                                  │ Student      │
-                                  ├──────────────┤
-                                  │ name         │
-                                  │ "Rahul"      │
-                                  └──────────────┘
+              STACK                         HEAP
+       ┌───────────────────┐
+       │                   │
+       │  s1 ──────────────┼──────────────┐
+       │                   │              │
+       │  s2 ──────────────┼──────────┐   │
+       │                   │          │   │
+       └───────────────────┘          │   │
+                                      │   │
+                                      ▼   ▼
+                               ┌───────────────┐
+                               │ Student Object│
+                               ├───────────────┤
+                               │ name          │
+                               │ "Rahul"       │
+                               └───────────────┘
 
                          Both references point
                          to the same object.
 ```
 
-This is one of the most important things to remember in Java.
+### The actual difference
 
-| Primitive Type | Reference Type |
+| Primitive variable | Reference variable |
 |---|---|
 | Holds a primitive value | Holds a reference to an object |
 | Assignment copies the value | Assignment copies the reference |
 | Cannot be `null` | Can be `null` |
-| Has a fixed set of 8 types | Includes classes, arrays, interfaces, etc. |
+| Has one of the 8 primitive types | Has a class, interface, array, or other reference type |
 
-**My takeaway:** Primitive assignment copies a value. Reference assignment copies a reference. It does not automatically create another object.
+**One thing I must remember:** Java is always pass-by-value. When a reference variable is passed or assigned, the reference value is copied, not the object itself.
+
+### Why is this important for the next topic?
+
+Because Wrapper Classes are objects.
+
+If I want to understand how `Integer` behaves, I first need to understand how references and objects behave.
 
 ---
 
-# Part 2 — Wrapper Classes
+# PART 2 — Why Wrapper Classes Exist
 
-## 2. Why Do Wrapper Classes Exist?
+## 2. The Problem: Collections and Primitive Types
 
-Now imagine I want to store integers inside an `ArrayList`.
+Imagine I want to store multiple integers in an `ArrayList`.
 
-I might naturally try:
+My first attempt might be:
 
 ```java
 ArrayList<int> numbers = new ArrayList<>();
@@ -188,9 +230,7 @@ ArrayList<int> numbers = new ArrayList<>();
 
 But Java doesn't allow this.
 
-Why?
-
-Because Java Generics work with reference types, not primitive types.
+The reason is that Java Generics require reference types as type arguments, not primitive types.
 
 For example:
 
@@ -200,39 +240,13 @@ ArrayList<Integer> numbers = new ArrayList<>();
 
 This works.
 
-But why `Integer` instead of `int`?
+But why `Integer`?
 
-Java provides something called **Wrapper Classes**.
+Because Java provides Wrapper Classes.
 
-They allow primitive values to be represented as objects.
+## 3. What Are Wrapper Classes?
 
-Think of a wrapper class as a class that provides an object representation of a primitive value.
-
-### Why are they useful?
-
-Wrapper Classes are useful when:
-
-1. Working with Collections such as `ArrayList`, `HashMap`, and `HashSet`.
-2. Using Java Generics.
-3. Representing a value that may be absent using `null`.
-4. Calling useful methods provided by wrapper classes.
-5. Working with APIs that expect objects instead of primitive values.
-
-For example:
-
-```java
-ArrayList<Integer> marks = new ArrayList<>();
-
-marks.add(90);
-marks.add(85);
-marks.add(95);
-```
-
-Here, `ArrayList` stores `Integer` objects rather than primitive `int` values.
-
----
-
-## 3. Wrapper Classes in Java
+A Wrapper Class is a class that represents a primitive value as an object.
 
 Java provides 8 wrapper classes for its 8 primitive types.
 
@@ -247,60 +261,63 @@ Java provides 8 wrapper classes for its 8 primitive types.
 | `char` | `Character` |
 | `boolean` | `Boolean` |
 
-A few important examples:
+For example:
 
 ```java
 int number = 10;
 
 Integer wrappedNumber = Integer.valueOf(number);
-
-double price = 99.5;
-
-Double wrappedPrice = Double.valueOf(price);
-
-char grade = 'A';
-
-Character wrappedGrade = Character.valueOf(grade);
 ```
 
 Here:
 
-- `int` is the primitive type.
-- `Integer` is the wrapper class.
-- `Integer.valueOf()` creates or returns an `Integer` object representing the value.
+- `number` is a primitive `int`.
+- `wrappedNumber` is a reference to an `Integer` object.
+- `Integer.valueOf()` provides the wrapper representation of the value.
 
-Wrapper objects are immutable.
+### What does the wrapper actually give me?
 
-That means once a wrapper object is created, its value cannot be changed.
+Wrapper Classes allow primitive values to work with APIs that expect objects.
 
-For example:
+They are useful for:
+
+1. Collections such as `ArrayList`, `HashMap`, and `HashSet`.
+2. Java Generics.
+3. Representing an absent value using `null`.
+4. Using utility methods such as `Integer.parseInt()`.
+5. Working with APIs that expect objects.
+
+### Important: Wrapper objects are immutable
+
+Consider:
 
 ```java
-Integer number = 10;
+Integer number = 100;
 
-number = 20;
+number = 200;
 ```
 
-It may look like the existing object's value changed, but that's not what happens.
+It might look like I changed the value inside the same object.
 
-The variable is reassigned to another `Integer` value. The original object, if no longer referenced, becomes eligible for garbage collection.
+But Wrapper Classes are immutable.
 
-**My takeaway:** Wrapper classes give primitive values an object representation. They are especially important when working with Generics and Collections.
+The variable is reassigned to another Integer value. The original object is not modified.
+
+If the original object is no longer reachable, it becomes eligible for garbage collection.
+
+**My takeaway:** Wrapper Classes allow primitive values to be represented as objects. They solve the problem of using primitive-like values with object-based APIs.
 
 ---
 
-# Part 3 — Boxing and Unboxing
+# PART 3 — Boxing and Unboxing
 
-## 4. Boxing and Unboxing
+Now I know why Wrapper Classes exist.
 
-Now that I understand wrapper classes, I need to understand how primitive values and wrapper objects are converted.
+But how do primitive values become wrapper objects, and how do wrapper objects become primitive values?
 
-There are two terms:
+That's where Boxing and Unboxing come in.
 
-- Boxing
-- Unboxing
-
-### Boxing
+## 4. Boxing
 
 Converting a primitive value into its corresponding wrapper object is called **Boxing**.
 
@@ -310,9 +327,9 @@ int number = 10;
 Integer wrappedNumber = Integer.valueOf(number);
 ```
 
-The primitive value `10` is represented by an `Integer` object.
+The primitive value `10` is represented by an Integer object.
 
-### Unboxing
+## 5. Unboxing
 
 Converting a wrapper object into its corresponding primitive value is called **Unboxing**.
 
@@ -322,32 +339,32 @@ Integer wrappedNumber = Integer.valueOf(10);
 int number = wrappedNumber.intValue();
 ```
 
-Here, the `Integer` object is converted back into an `int`.
+Here, the Integer object is converted back into a primitive `int`.
 
-### Visual understanding
+### Understand the complete conversion
 
 ```mermaid
 flowchart TD
-    A["Primitive Value<br/>int number = 10"] -->|"Boxing"| B["Wrapper Object<br/>Integer"]
-    B -->|"Unboxing"| C["Primitive Value<br/>int number = 10"]
+    A["Primitive Value<br/>int = 10"] -->|"Boxing"| B["Integer Object"]
+    B -->|"Unboxing"| C["Primitive Value<br/>int = 10"]
 
     style A fill:#E8F1FF,stroke:#3973C6,color:#17365D
     style B fill:#E9F7EF,stroke:#27834A,color:#14532D
     style C fill:#E8F1FF,stroke:#3973C6,color:#17365D
 ```
 
-**My takeaway:**
+**Remember:**
 
 - Boxing: Primitive → Wrapper Object
 - Unboxing: Wrapper Object → Primitive
 
 ---
 
-## 5. AutoBoxing and AutoUnboxing
+## 6. AutoBoxing and AutoUnboxing
 
-Writing `Integer.valueOf()` and `intValue()` every time can become repetitive.
+Writing `Integer.valueOf()` and `intValue()` every time would become repetitive.
 
-Java makes this easier through **AutoBoxing** and **AutoUnboxing**.
+Java makes this easier by automatically performing these conversions.
 
 ### AutoBoxing
 
@@ -363,7 +380,7 @@ I didn't explicitly call `Integer.valueOf()`.
 
 Java handles the conversion automatically.
 
-Conceptually, the compiler performs a conversion equivalent to:
+Conceptually, this is equivalent to:
 
 ```java
 Integer wrappedNumber = Integer.valueOf(number);
@@ -371,7 +388,7 @@ Integer wrappedNumber = Integer.valueOf(number);
 
 ### AutoUnboxing
 
-When Java automatically converts a wrapper object into its primitive value, it is called AutoUnboxing.
+When Java automatically converts a wrapper object into its corresponding primitive value, it is called AutoUnboxing.
 
 ```java
 Integer wrappedNumber = 20;
@@ -379,38 +396,60 @@ Integer wrappedNumber = 20;
 int number = wrappedNumber;
 ```
 
-Conceptually, Java performs something equivalent to:
+Conceptually, this is equivalent to:
 
 ```java
 int number = wrappedNumber.intValue();
 ```
 
-### Visual execution flow
+### Complete flow
 
 ```mermaid
 flowchart TD
-    A["Primitive int value"] --> B["Assign to Integer variable"]
-    B --> C["AutoBoxing"]
-    C --> D["Integer wrapper object"]
+    A["Primitive int"] --> B["Assign to Integer variable"]
+    B --> C["Compiler performs AutoBoxing"]
+    C --> D["Integer reference"]
 
     D --> E["Assign to int variable"]
-    E --> F["AutoUnboxing"]
-    F --> G["Primitive int value"]
+    E --> F["Compiler performs AutoUnboxing"]
+    F --> G["Primitive int"]
 
     style A fill:#E8F1FF,stroke:#3973C6,color:#17365D
     style D fill:#E9F7EF,stroke:#27834A,color:#14532D
     style G fill:#E8F1FF,stroke:#3973C6,color:#17365D
 ```
 
+### What actually happens under the hood?
+
+The Java compiler understands that the types are different.
+
+When it sees:
+
+```java
+Integer number = 10;
+```
+
+It inserts the necessary boxing conversion.
+
+When it sees:
+
+```java
+int value = number;
+```
+
+It inserts the necessary unboxing conversion.
+
+The important point is that AutoBoxing and AutoUnboxing are language features handled by the compiler. They are not magic operations performed by the JVM on arbitrary assignments.
+
+**My takeaway:** Boxing and Unboxing are the conversions. AutoBoxing and AutoUnboxing are Java's automatic way of performing those conversions.
+
 ---
 
-## 6. Where Does Java Automatically Box and Unbox?
+## 7. Where Does Java Automatically Box and Unbox?
 
-AutoBoxing and AutoUnboxing aren't limited to variable assignments.
+These conversions can happen in several places.
 
-Java can perform these conversions in different situations.
-
-### 1. During assignment
+### A. Variable assignment
 
 ```java
 int a = 10;
@@ -420,7 +459,7 @@ Integer b = a; // AutoBoxing
 int c = b;     // AutoUnboxing
 ```
 
-### 2. While passing method arguments
+### B. Method arguments
 
 ```java
 public class Main {
@@ -442,12 +481,13 @@ The method expects an `Integer`, but I pass an `int`.
 
 Java automatically boxes the value.
 
-### 3. While returning values
+### C. Method return values
 
 ```java
 public class Main {
 
     static Integer getNumber() {
+
         int number = 100;
 
         return number;
@@ -462,11 +502,11 @@ public class Main {
 }
 ```
 
-The method returns an `Integer`, but the local variable is an `int`.
+The return expression is an `int`, but the method returns an `Integer`.
 
-Java automatically boxes the returned value.
+Java automatically boxes it.
 
-### 4. During arithmetic operations
+### D. Arithmetic operations
 
 ```java
 Integer a = 10;
@@ -483,7 +523,7 @@ Output:
 30
 ```
 
-Java unboxes both `Integer` objects before performing primitive integer addition.
+Java unboxes both Integer objects before performing primitive integer addition.
 
 Conceptually:
 
@@ -491,15 +531,15 @@ Conceptually:
 int result = a.intValue() + b.intValue();
 ```
 
-**My takeaway:** Java can automatically box and unbox values in assignments, method calls, return statements, and operations where the conversion is required.
+**My takeaway:** Java can automatically box or unbox values during assignments, method calls, return statements, and operations where the conversion is required.
 
 ---
 
-# Part 4 — AutoBoxing with Collections and Generics
+# PART 4 — Where Wrapper Classes Become Useful
 
-## 7. AutoBoxing with Collections and Generics
+## 8. AutoBoxing with Collections and Generics
 
-This is one of the most practical places where AutoBoxing is used.
+Now I can finally understand why Wrapper Classes are so important when using Collections.
 
 Consider:
 
@@ -513,7 +553,7 @@ numbers.add(30);
 
 The `add()` method expects an `Integer` object.
 
-But I am passing primitive `int` values.
+But I'm passing primitive `int` values.
 
 Why does this work?
 
@@ -527,13 +567,15 @@ numbers.add(Integer.valueOf(20));
 numbers.add(Integer.valueOf(30));
 ```
 
-Now consider retrieving a value:
+### What happens when I retrieve a value?
 
 ```java
 int number = numbers.get(0);
 ```
 
-`get()` returns an `Integer`, but I am assigning it to an `int`.
+The `get()` method returns an `Integer`.
+
+But I'm assigning it to an `int`.
 
 Java automatically unboxes it.
 
@@ -547,7 +589,7 @@ flowchart TD
     D --> E["Stored in ArrayList"]
 
     E --> F["numbers.get(0)"]
-    F --> G["Returns Integer"]
+    F --> G["Returns Integer reference"]
     G --> H["AutoUnboxing"]
     H --> I["Primitive int: 10"]
 
@@ -559,36 +601,42 @@ flowchart TD
 ### Memory perspective
 
 ```text
-                  STACK                         HEAP
-        ┌─────────────────────┐
-        │ numbers             │
-        │ Reference ──────────┼──────────────┐
-        └─────────────────────┘              │
-                                             ▼
-                                    ┌──────────────────┐
-                                    │ ArrayList        │
-                                    ├──────────────────┤
-                                    │ Element 0 ───────┼─────┐
-                                    │ Element 1 ───────┼──┐  │
-                                    │ Element 2 ───────┼┐ │  │
-                                    └──────────────────┘│ │  │
-                                                        │ │  │
-                                      ┌─────────────────┘ │  │
-                                      ▼                   ▼  ▼
-                                 ┌─────────┐         ┌─────────┐
-                                 │ Integer │         │ Integer │
-                                 │  30     │         │  20     │
-                                 └─────────┘         └─────────┘
+                    STACK                         HEAP
+          ┌──────────────────────┐
+          │ numbers              │
+          │ Reference ───────────┼─────────────┐
+          └──────────────────────┘             │
+                                               ▼
+                                    ┌────────────────────┐
+                                    │ ArrayList Object   │
+                                    ├────────────────────┤
+                                    │ Element 0 ─────────┼────┐
+                                    │ Element 1 ─────────┼──┐ │
+                                    │ Element 2 ─────────┼┐ │ │
+                                    └────────────────────┘│ │ │
+                                                         │ │ │
+                                                         ▼ ▼ ▼
+                                                    ┌───────────┐
+                                                    │ Integer   │
+                                                    │ value: 10 │
+                                                    └───────────┘
 
-                                           ┌─────────┐
-                                           │ Integer │
-                                           │  10     │
-                                           └─────────┘
+                                                    ┌───────────┐
+                                                    │ Integer   │
+                                                    │ value: 20 │
+                                                    └───────────┘
+
+                                                    ┌───────────┐
+                                                    │ Integer   │
+                                                    │ value: 30 │
+                                                    └───────────┘
 ```
 
-The diagram is a conceptual representation of the references and objects involved. Actual internal storage of collection elements is implementation-dependent.
+This is a conceptual illustration. The actual internal representation of collection storage depends on its implementation.
 
-### Why can't I use primitives directly in Generics?
+### Why can't I use `ArrayList<int>`?
+
+Because Java Generics require reference types as type arguments.
 
 This is invalid:
 
@@ -602,19 +650,22 @@ This is valid:
 ArrayList<Integer> numbers = new ArrayList<>();
 ```
 
-Java Generics require reference types as type arguments. Wrapper classes make it possible to use primitive-like values with generic APIs.
-
-**My takeaway:** Collections and Generics use reference types. AutoBoxing and AutoUnboxing make working with primitive values convenient.
+**My takeaway:** Collections work with reference types. Wrapper Classes make primitive-like values usable with Generics, and AutoBoxing makes the syntax convenient.
 
 ---
 
-# Part 5 — Important Problems with Unboxing
+# PART 5 — The Problems We Need to Watch Out For
 
-## 8. NullPointerException During Unboxing
+Now that I understand how automatic conversion works, I need to understand its risks.
 
-This is something I need to be careful about.
+There are two particularly important areas:
 
-A wrapper reference can contain `null`.
+1. `null` during unboxing.
+2. Object comparison using `==` and `.equals()`.
+
+## 9. NullPointerException During Unboxing
+
+A reference variable can contain `null`.
 
 A primitive variable cannot.
 
@@ -628,15 +679,11 @@ int value = number;
 System.out.println(value);
 ```
 
-This code compiles, but it throws:
-
-```text
-NullPointerException
-```
+This code compiles, but it throws a `NullPointerException` at runtime.
 
 Why?
 
-Because Java tries to unbox `number`.
+Because Java attempts to unbox the Integer reference.
 
 Conceptually:
 
@@ -652,9 +699,9 @@ Java cannot call `intValue()` on a null reference.
 
 ```mermaid
 flowchart TD
-    A["Integer number = null"] --> B["Assign number to int"]
-    B --> C["Java attempts AutoUnboxing"]
-    C --> D{"Is the reference null?"}
+    A["Integer number = null"] --> B["Assign to primitive int"]
+    B --> C["AutoUnboxing"]
+    C --> D{"Is reference null?"}
     D -->|"Yes"| E["NullPointerException"]
     D -->|"No"| F["Extract primitive value"]
 
@@ -662,7 +709,9 @@ flowchart TD
     style F fill:#E9F7EF,stroke:#27834A,color:#14532D
 ```
 
-### A safer approach
+### How can I avoid it?
+
+Check the reference before unboxing.
 
 ```java
 Integer number = null;
@@ -678,21 +727,15 @@ Output:
 0
 ```
 
-I check whether the reference is `null` before unboxing it.
-
-**My takeaway:** AutoUnboxing a null wrapper reference causes a `NullPointerException`. Always check nullable wrapper values before using them as primitives.
+**My takeaway:** A wrapper reference can be null, but unboxing null causes a NullPointerException. Check nullable wrappers before converting them into primitives.
 
 ---
 
-# Part 6 — Understanding Integer Objects
+## 10. `==` vs `.equals()`
 
-## 9. `==` vs `.equals()`
+Before understanding Integer Caching, I need to understand how Java compares objects.
 
-This is one of the most confusing parts of Wrapper Classes.
-
-I need to understand the difference between comparing primitive values and comparing objects.
-
-### Comparing primitive values
+Consider two primitive variables:
 
 ```java
 int a = 100;
@@ -707,87 +750,106 @@ Output:
 true
 ```
 
-For primitives, `==` compares the actual values.
+For primitive values, `==` compares the actual values.
 
-### Comparing wrapper objects
+But what happens with objects?
 
 ```java
-Integer a = new Integer(100);
-Integer b = new Integer(100);
+Integer a = Integer.valueOf(100);
+Integer b = Integer.valueOf(100);
 
 System.out.println(a == b);
 System.out.println(a.equals(b));
 ```
 
-Conceptually, the output is:
+The output may be:
 
 ```text
-false
+true
 true
 ```
 
-Note: The `Integer(int)` constructor is deprecated for removal. It is shown here only to illustrate the idea of two distinct objects. Do not use it in normal code.
+We'll understand why the first result is `true` when we reach Integer Caching.
 
-Why are the results different?
+For now, understand what each operator means.
 
-Because `==` and `.equals()` do different things when used with reference types.
+### `==` with reference types
 
-### `==` with objects
+When used with objects, `==` checks whether both references point to the same object.
 
-For reference types, `==` checks whether both references point to the same object.
-
-It checks **object identity**.
+This is called **reference identity**.
 
 ### `.equals()` with objects
 
-`.equals()` checks logical equality according to the implementation of that class.
+`.equals()` checks logical equality according to the class's implementation.
 
-The `Integer` class overrides `.equals()` to compare the integer values.
+For `Integer`, `.equals()` compares the numerical values.
 
-### Memory perspective
-
-```text
-                    STACK                         HEAP
-          ┌────────────────────┐
-          │ a                  │
-          │ Reference ─────────┼───────────────┐
-          ├────────────────────┤               │
-          │ b                  │               │
-          │ Reference ─────────┼───────────┐   │
-          └────────────────────┘           │   │
-                                           ▼   ▼
-                                      ┌────────────┐
-                                      │ Integer A  │
-                                      ├────────────┤
-                                      │ value: 100 │
-                                      └────────────┘
-
-                                      ┌────────────┐
-                                      │ Integer B  │
-                                      ├────────────┤
-                                      │ value: 100 │
-                                      └────────────┘
-
-                    Two different objects
-                    containing equal values.
-```
-
-So:
+### Let's remove the confusion with two separate objects
 
 ```java
-a == b       // false
-a.equals(b)  // true
+Integer a = Integer.valueOf(100);
+Integer b = Integer.valueOf(1000);
+
+System.out.println(a.equals(b));
+```
+
+The values are different, so the result is:
+
+```text
+false
+```
+
+But to understand identity properly, consider two references pointing to the same object:
+
+```java
+Integer a = Integer.valueOf(100);
+
+Integer b = a;
+
+System.out.println(a == b);
+System.out.println(a.equals(b));
+```
+
+Output:
+
+```text
+true
+true
+```
+
+Both references point to the same object, and both objects represent the same value.
+
+### Memory perspective: Same object
+
+```text
+                 STACK                         HEAP
+          ┌──────────────────┐
+          │ a                │
+          │ Reference ───────┼──────────────┐
+          ├──────────────────┤              │
+          │ b                │              │
+          │ Reference ───────┼──────────┐   │
+          └──────────────────┘          │   │
+                                        ▼   ▼
+                                   ┌─────────────┐
+                                   │ Integer     │
+                                   ├─────────────┤
+                                   │ value: 100  │
+                                   └─────────────┘
+
+                               One object, two references.
 ```
 
 ### Quick comparison
 
-| Comparison | What it checks |
+| Expression | Meaning |
 |---|---|
-| `intA == intB` | Primitive values |
-| `integerA == integerB` | Object identity |
-| `integerA.equals(integerB)` | Integer values |
+| `a == b` for primitives | Compares primitive values |
+| `a == b` for references | Compares object identity |
+| `a.equals(b)` | Uses the class's logical equality implementation |
 
-One more useful method:
+One useful method is:
 
 ```java
 Objects.equals(a, b);
@@ -810,17 +872,17 @@ Output:
 false
 ```
 
-**My takeaway:** For primitives, `==` compares values. For references, `==` compares identity. For `Integer`, `.equals()` compares the numerical values.
+**My takeaway:** `==` checks primitive values or reference identity. `.equals()` checks logical equality according to the class.
 
 ---
 
-## 10. How Does Integer Work?
+## 11. Understanding Integer Internally
 
-`Integer` is a wrapper class for the primitive `int`.
+Now I want to focus specifically on the `Integer` class.
 
-It provides useful methods for working with integer values.
+`Integer` is the wrapper class for primitive `int`.
 
-For example:
+It is immutable and provides useful methods and constants.
 
 ```java
 public class Main {
@@ -852,7 +914,7 @@ Output:
 200
 ```
 
-Some useful methods and fields:
+### Useful Integer methods and fields
 
 | Method / Field | Purpose |
 |---|---|
@@ -863,7 +925,7 @@ Some useful methods and fields:
 | `Integer.MAX_VALUE` | Maximum int value |
 | `Integer.MIN_VALUE` | Minimum int value |
 
-### Important point: Integer is immutable
+### Integer is immutable
 
 Consider:
 
@@ -881,26 +943,32 @@ Output:
 150
 ```
 
-It might look like Java modified the existing `Integer` object.
+Did Java modify the original Integer object?
 
-But wrapper objects are immutable.
+No.
 
-Conceptually, the process is:
+Conceptually, Java performs these steps:
 
-1. Unbox `number` into an `int`.
-2. Add `50`.
-3. Box the result into an `Integer`.
-4. Reassign the variable to the resulting reference.
+```mermaid
+flowchart TD
+    A["Integer reference: number"] --> B["Unbox: obtain 100"]
+    B --> C["Add 50"]
+    C --> D["Result: primitive 150"]
+    D --> E["Box result into Integer"]
+    E --> F["Reassign number"]
 
-The original object is not modified.
+    style A fill:#E8F1FF,stroke:#3973C6,color:#17365D
+    style E fill:#E9F7EF,stroke:#27834A,color:#14532D
+    style F fill:#E9F7EF,stroke:#27834A,color:#14532D
+```
+
+The original object is not modified. The variable is reassigned to the result.
 
 ---
 
-## 11. Integer Caching
+## 12. Integer Caching
 
-This is where things get interesting.
-
-Consider:
+Now we can finally understand why this code can return `true`:
 
 ```java
 Integer a = 100;
@@ -915,68 +983,49 @@ Output:
 true
 ```
 
-But now:
-
-```java
-Integer a = 1000;
-Integer b = 1000;
-
-System.out.println(a == b);
-```
-
-On a typical JVM with the default Integer cache, output:
-
-```text
-false
-```
-
 Why?
 
-Because Java uses something called **Integer Caching**.
+Because Java uses **Integer Caching**.
 
 ### What is Integer Caching?
 
-Java maintains a cache of commonly used Integer values.
-
-The Integer values from:
+Java guarantees caching for Integer values from:
 
 ```text
 -128 to 127
 ```
 
-are guaranteed to be cached by the standard boxing conversion behaviour and `Integer.valueOf()`.
+When a value in this range is obtained through `Integer.valueOf()` or the corresponding boxing conversion, Java can reuse a cached Integer object.
 
-When I write:
+Consider:
 
 ```java
-Integer a = 100;
-Integer b = 100;
+Integer a = Integer.valueOf(100);
+Integer b = Integer.valueOf(100);
 ```
 
-Java can reuse the same cached object.
+Both references can point to the same cached object.
 
-Therefore, both references can point to the same object.
-
-### Memory perspective: Cached value
+### Memory perspective
 
 ```text
-                    STACK                         HEAP
-          ┌────────────────────┐
-          │ a                  │
-          │ Reference ─────────┼──────────────┐
-          ├────────────────────┤              │
-          │ b                  │              │
-          │ Reference ─────────┼──────────┐   │
-          └────────────────────┘          │   │
-                                          ▼   ▼
-                                    ┌──────────────┐
-                                    │ Cached       │
-                                    │ Integer      │
-                                    ├──────────────┤
-                                    │ value: 100   │
-                                    └──────────────┘
+                 STACK                         HEAP
+          ┌──────────────────┐
+          │ a                │
+          │ Reference ───────┼──────────────┐
+          ├──────────────────┤              │
+          │ b                │              │
+          │ Reference ───────┼──────────┐   │
+          └──────────────────┘          │   │
+                                        ▼   ▼
+                                   ┌──────────────┐
+                                   │ Cached       │
+                                   │ Integer      │
+                                   ├──────────────┤
+                                   │ value: 100   │
+                                   └──────────────┘
 
-                            One shared object
+                              One shared cached object.
 ```
 
 Therefore:
@@ -986,60 +1035,61 @@ a == b       // true
 a.equals(b)  // true
 ```
 
-### What happens outside the guaranteed cache range?
+### What happens outside the guaranteed range?
 
 Consider:
 
 ```java
-Integer a = 1000;
-Integer b = 1000;
+Integer a = Integer.valueOf(1000);
+Integer b = Integer.valueOf(1000);
 
 System.out.println(a == b);
 System.out.println(a.equals(b));
 ```
 
-With the usual default cache:
+With the usual default cache, output is:
 
 ```text
 false
 true
 ```
 
-The references normally point to separate objects, even though the values are equal.
+The two calls typically return separate objects.
 
-### Memory perspective: Separate objects
+### Memory perspective
 
 ```text
-                    STACK                         HEAP
-          ┌────────────────────┐
-          │ a                  │
-          │ Reference ─────────┼───────────────┐
-          ├────────────────────┤               │
-          │ b                  │               │
-          │ Reference ─────────┼───────────┐   │
-          └────────────────────┘           │   │
-                                           ▼   ▼
-                                      ┌────────────┐
-                                      │ Integer A  │
-                                      ├────────────┤
-                                      │ value:1000 │
-                                      └────────────┘
+                 STACK                         HEAP
+          ┌──────────────────┐
+          │ a                │
+          │ Reference ───────┼───────────────┐
+          ├──────────────────┤               │
+          │ b                │               │
+          │ Reference ───────┼───────────┐   │
+          └──────────────────┘           │   │
+                                         ▼   ▼
+                                    ┌────────────┐
+                                    │ Integer A  │
+                                    ├────────────┤
+                                    │ value:1000 │
+                                    └────────────┘
 
-                                      ┌────────────┐
-                                      │ Integer B  │
-                                      ├────────────┤
-                                      │ value:1000 │
-                                      └────────────┘
+                                    ┌────────────┐
+                                    │ Integer B  │
+                                    ├────────────┤
+                                    │ value:1000 │
+                                    └────────────┘
 
-                          Separate objects,
-                          equal numerical values.
+                             Two different objects.
 ```
 
-### Integer caching flow
+The values are equal, but the references are different.
+
+### Integer caching decision flow
 
 ```mermaid
 flowchart TD
-    A["Integer.valueOf(value)"] --> B{"Is value within<br/>guaranteed cache range?"}
+    A["Integer.valueOf(value)"] --> B{"Within guaranteed<br/>cache range?"}
     B -->|"Yes: -128 to 127"| C["Reuse cached Integer object"]
     B -->|"No"| D["Obtain an Integer object<br/>outside guaranteed cache"]
     C --> E["Return reference"]
@@ -1049,31 +1099,35 @@ flowchart TD
     style D fill:#E8F1FF,stroke:#3973C6,color:#17365D
 ```
 
-A JVM may cache additional values beyond the guaranteed range. Therefore, I should never depend on `==` to compare Integer values.
+A JVM may cache additional values beyond the guaranteed range, so I should not depend on `==` for comparing Integer values.
 
 ### The correct habit
 
-Use:
+For comparing Integer values, use:
 
 ```java
 a.equals(b);
 ```
 
-Or, if either reference might be null:
+If either reference may be null, use:
 
 ```java
 Objects.equals(a, b);
 ```
 
-**My takeaway:** Integer caching is an optimization. It explains why `==` may behave differently for different values. I should use `.equals()` when comparing Integer values.
+**My takeaway:** Integer Caching is an optimization. It explains why two Integer references may point to the same object for certain values. It does not change the rule that `==` compares object identity.
 
 ---
 
-# Part 7 — Revising Abstract Classes
+# PART 6 — OOP Revision: Abstract Classes
 
-## 12. Abstract Class Revision and Interview Questions
+## 13. Revising Abstract Classes
 
-Before moving to POJOs, I want to revise Abstract Classes because they are important in OOP and interviews.
+Now that the Wrapper Class concepts are clear, I want to revise Abstract Classes before moving towards POJOs.
+
+I have already studied Abstraction and Abstract Classes, so this is a revision rather than a completely new topic.
+
+### What is an Abstract Class?
 
 An abstract class is a class declared using the `abstract` keyword.
 
@@ -1100,13 +1154,13 @@ An abstract method has no method body.
 
 A concrete method has a method body.
 
-### Why do we need abstract classes?
+### Why use an Abstract Class?
 
 Imagine I have different types of animals.
 
 Every animal should have a `sound()` method, but each animal makes a different sound.
 
-I can define a common structure in an abstract class and let child classes provide their own implementations.
+I can define common behaviour in the parent class and allow child classes to implement their own version.
 
 ```java
 abstract class Animal {
@@ -1157,11 +1211,11 @@ Dog barks
 Eating...
 ```
 
-### Abstract class constructor execution
+### Can an Abstract Class have a constructor?
 
-An abstract class cannot be instantiated directly, but it can have a constructor.
+Yes.
 
-When I create a child object, the parent constructor executes first.
+Even though I cannot create an abstract class object directly, its constructor executes when a child object is created.
 
 ```java
 abstract class Animal {
@@ -1198,9 +1252,9 @@ Dog constructor
 
 ```mermaid
 flowchart TD
-    A["new Dog()"] --> B["Memory allocated for Dog object"]
-    B --> C["Animal constructor executes"]
-    C --> D["Dog constructor executes"]
+    A["new Dog()"] --> B["Allocate Dog object"]
+    B --> C["Execute Animal constructor"]
+    C --> D["Execute Dog constructor"]
     D --> E["Dog object initialization completes"]
 
     style C fill:#E8F1FF,stroke:#3973C6,color:#17365D
@@ -1208,21 +1262,7 @@ flowchart TD
     style E fill:#E9F7EF,stroke:#27834A,color:#14532D
 ```
 
-### Important rules of Abstract Classes
-
-1. An abstract class cannot be instantiated directly.
-2. An abstract class can have constructors.
-3. It can contain instance variables.
-4. It can contain both abstract and concrete methods.
-5. A concrete child class must implement all inherited abstract methods.
-6. An abstract class can extend another class.
-7. An abstract class cannot be declared `final`.
-8. An abstract class does not necessarily need to contain an abstract method.
-9. An abstract method cannot be `private`, `static`, or `final`.
-
 ### Abstract Class vs Interface
-
-This is an important comparison because both are used to define common behaviour and contracts.
 
 | Abstract Class | Interface |
 |---|---|
@@ -1230,9 +1270,9 @@ This is an important comparison because both are used to define common behaviour
 | Can have constructors | Cannot have constructors |
 | Can have instance variables | Cannot have ordinary instance variables |
 | Can have abstract and concrete methods | Can have abstract, default, static and private methods |
-| Can maintain object state | Fields are implicitly `public static final` constants |
+| Can maintain object state | Fields are implicitly `public static final` |
 | A class can extend only one class | A class can implement multiple interfaces |
-| Useful for closely related classes sharing state and implementation | Useful for defining capabilities and contracts |
+| Useful for related classes sharing state and implementation | Useful for defining capabilities and contracts |
 
 ### Can I use both together?
 
@@ -1269,43 +1309,51 @@ class Car extends Vehicle implements GPS {
 
 A class can extend an abstract class and implement multiple interfaces.
 
-### Interview questions to revise
+### Important rules to remember
 
-**Q1. Can we create an object of an abstract class?**
+1. An abstract class cannot be instantiated directly.
+2. It can have constructors.
+3. It can have instance variables.
+4. It can have abstract and concrete methods.
+5. A concrete child class must implement all inherited abstract methods.
+6. An abstract class can extend another class.
+7. An abstract class cannot be declared `final`.
+8. An abstract class does not necessarily need an abstract method.
+9. An abstract method cannot be `private`, `static`, or `final`.
 
-No. An abstract class cannot be instantiated directly. However, we can create a reference of its type that points to a child object.
+### Interview questions
 
-**Q2. Can an abstract class have a constructor?**
+**Q1. Can an abstract class have a constructor?**
 
-Yes. Its constructor executes when a child-class object is created.
+Yes. Its constructor executes when a child object is created.
 
-**Q3. Can an abstract class have no abstract methods?**
+**Q2. Can an abstract class contain no abstract methods?**
 
-Yes. A class can be declared abstract even if it contains only concrete methods.
+Yes. A class can be declared abstract even if all its methods are concrete.
 
-**Q4. Can an abstract class extend another abstract class?**
+**Q3. Can an abstract class extend another abstract class?**
 
-Yes. An abstract class can extend another abstract class.
+Yes.
 
-**Q5. What happens if a child class does not implement all abstract methods?**
+**Q4. What if a child class does not implement all inherited abstract methods?**
 
-The child class must also be declared abstract. Otherwise, it produces a compilation error.
+It must also be declared abstract. Otherwise, compilation fails.
 
-**My takeaway:** An abstract class provides a shared base with common state and behaviour, while allowing child classes to provide their own implementations.
+**My takeaway:** Abstract Classes provide a shared base containing state and common implementation while allowing child classes to provide specific behaviour.
 
 ---
 
-# Part 8 — POJO Classes
+# PART 7 — Practical Java: POJO Classes
 
-## 13. What Are POJO Classes?
+## 14. What Are POJO Classes?
 
 POJO stands for **Plain Old Java Object**.
 
-The name sounds complicated, but the idea is simple.
+The idea is simple.
 
 A POJO is an ordinary Java class that is not forced to extend a particular framework class or implement a framework-specific interface just to represent an object.
 
-For example:
+Consider:
 
 ```java
 public class Student {
@@ -1358,7 +1406,9 @@ It contains:
 - Getters and setters to access or update fields.
 - No mandatory dependency on a particular framework.
 
-A POJO does not strictly have to contain getters and setters. The main idea is that it is an ordinary Java object without unnecessary framework-specific restrictions.
+A POJO does not strictly need getters and setters. It can also have methods, validation logic, and other behaviour.
+
+The important idea is that it remains an ordinary Java object.
 
 ### Creating a POJO object
 
@@ -1387,34 +1437,36 @@ Vivek
 ### Memory perspective
 
 ```text
-                     STACK                         HEAP
-          ┌─────────────────────┐
-          │ student             │
-          │ Reference ──────────┼───────────────┐
-          └─────────────────────┘               │
-                                                ▼
-                                     ┌──────────────────────┐
-                                     │ Student Object       │
-                                     ├──────────────────────┤
-                                     │ id   = 101           │
-                                     │ name = "Vivek"       │
-                                     │ age  = 20            │
-                                     └──────────────────────┘
+                 STACK                         HEAP
+        ┌─────────────────────┐
+        │ student             │
+        │ Reference ──────────┼───────────────┐
+        └─────────────────────┘               │
+                                              ▼
+                                   ┌─────────────────────┐
+                                   │ Student Object      │
+                                   ├─────────────────────┤
+                                   │ id   = 101          │
+                                   │ name = "Vivek"      │
+                                   │ age  = 20           │
+                                   └─────────────────────┘
 ```
 
-The `student` variable holds a reference to the Student object.
+The `student` variable holds a reference to the object.
 
 The object's fields represent its state.
 
-**My takeaway:** A POJO is simply a normal Java object used to represent data and, when needed, related behaviour.
+**My takeaway:** A POJO is an ordinary Java object used to represent application data and, when needed, related behaviour.
 
 ---
 
-## 14. Why Are POJOs Useful in Frameworks?
+## 15. Why Are POJOs Useful in Backend Frameworks?
 
 This is where POJOs become especially important for backend development.
 
-When building backend applications, I frequently work with data such as:
+Imagine I am building a backend application.
+
+It might deal with:
 
 - Users
 - Products
@@ -1423,9 +1475,9 @@ When building backend applications, I frequently work with data such as:
 - Students
 - Employees
 
-I need Java classes to represent these entities.
+I need Java classes to represent these things.
 
-For example, in a backend application, I might have:
+For example:
 
 ```java
 public class User {
@@ -1440,9 +1492,7 @@ This class represents a User in my application.
 
 Frameworks can work with these ordinary Java objects.
 
-### How frameworks use POJOs
-
-Different frameworks use Java objects in different ways.
+### How different frameworks use them
 
 **1. Spring Framework**
 
@@ -1454,13 +1504,13 @@ These objects can be injected into other classes using Dependency Injection.
 
 Hibernate can map Java classes and their fields to database tables.
 
-For example, a `User` class can represent records in a `users` table when configured as an entity.
+For example, a User class can represent records in a `users` table when configured as an entity.
 
 **3. Jackson**
 
 Jackson can convert Java objects into JSON and JSON into Java objects.
 
-For example, a Java `User` object might be serialized into:
+For example, a Java User object can be serialized into:
 
 ```json
 {
@@ -1471,17 +1521,17 @@ For example, a Java `User` object might be serialized into:
 
 The exact behaviour depends on the object's configuration, constructors, getters, fields, and serialization settings.
 
-### Backend data flow
+### How POJOs fit into a backend application
 
 ```mermaid
 flowchart TD
-    A["Client Request<br/>JSON Data"] --> B["Controller"]
+    A["Client sends JSON"] --> B["Controller"]
     B --> C["Java Object / POJO"]
     C --> D["Service Layer"]
-    D --> E["Repository / Data Access"]
+    D --> E["Repository Layer"]
     E --> F["Database"]
 
-    F --> G["Repository Returns Data"]
+    F --> G["Repository returns data"]
     G --> H["Service Layer"]
     H --> I["Controller"]
     I --> J["JSON Response"]
@@ -1491,13 +1541,13 @@ flowchart TD
     style J fill:#E8F1FF,stroke:#3973C6,color:#17365D
 ```
 
-The POJO acts as a Java representation of the data moving through the application.
+The POJO acts as a Java representation of data moving through the application.
 
-This makes the application easier to organize and maintain.
+It helps keep data representation separate from the framework's infrastructure and business logic.
 
-### Why I should understand this for backend development
+### Why should I understand this?
 
-When I work with frameworks such as Spring Boot, I will frequently see classes representing:
+When I work with frameworks such as Spring Boot, I will frequently see Java classes representing:
 
 - Request bodies
 - Response objects
@@ -1507,21 +1557,348 @@ When I work with frameworks such as Spring Boot, I will frequently see classes r
 
 These are often ordinary Java classes or POJOs.
 
-**My takeaway:** POJOs help separate application data from framework-specific logic. They make Java applications easier to structure, test, and maintain.
+**My takeaway:** POJOs help organize application data and are widely used by backend frameworks.
 
 ---
 
-# Part 9 — Java File Structure
+# PART 8 — Understanding Java Source Files
 
-## 15. Why Is Only One Public Top-Level Class Allowed in a Java File?
+## 16. Why Does Java Allow Only One Public Top-Level Type Per File?
 
-I have probably noticed something while creating Java files:
+This is the last topic of the lesson, but it connects to something important about how Java source code is organized and compiled.
 
-A Java source file can contain multiple classes, but normally only one public top-level type is allowed in a source file.
+I don't want to remember this as just a rule.
 
-Let's understand this properly.
+I want to understand:
+
+1. What is a source file?
+2. What is a top-level class?
+3. Why does a public class need a matching filename?
+4. What happens when `javac` compiles the file?
+5. What happens when the JVM loads the compiled classes?
+
+### First, understand what a top-level class is
 
 Consider:
+
+```java
+public class Main {
+
+    public static void main(String[] args) {
+        Student student = new Student();
+    }
+}
+
+class Student {
+}
+```
+
+There are two classes here:
+
+- `Main`
+- `Student`
+
+Both are top-level classes because neither is declared inside another class.
+
+Now look at this:
+
+```java
+public class Main {
+
+    class Student {
+    }
+}
+```
+
+Here, `Student` is declared inside `Main`.
+
+It is a nested class, not a top-level class.
+
+This distinction matters because the source-file naming rule applies to public top-level types.
+
+---
+
+### 16.1 Can one Java file contain multiple classes?
+
+Yes.
+
+Consider a file named `Main.java`:
+
+```java
+public class Main {
+}
+
+class Student {
+}
+
+class Teacher {
+}
+```
+
+This is valid.
+
+Why?
+
+Because Java allows multiple top-level types in a source file, provided the public top-level type restriction is followed.
+
+When I compile:
+
+```bash
+javac Main.java
+```
+
+The compiler can produce:
+
+```text
+Project/
+│
+├── Main.java
+│
+├── Main.class
+├── Student.class
+└── Teacher.class
+```
+
+One source file can produce multiple `.class` files.
+
+### Under the hood: Compilation
+
+```mermaid
+flowchart TD
+    A["Main.java<br/>Source File"] --> B["javac Compiler"]
+    B --> C["Parse and analyse source"]
+    C --> D["Compile Main"]
+    C --> E["Compile Student"]
+    C --> F["Compile Teacher"]
+
+    D --> G["Main.class"]
+    E --> H["Student.class"]
+    F --> I["Teacher.class"]
+
+    style A fill:#E8F1FF,stroke:#3973C6,color:#17365D
+    style B fill:#F1EAFE,stroke:#7652A6,color:#38205E
+    style G fill:#E9F7EF,stroke:#27834A,color:#14532D
+    style H fill:#E9F7EF,stroke:#27834A,color:#14532D
+    style I fill:#E9F7EF,stroke:#27834A,color:#14532D
+```
+
+Notice:
+
+The `.java` file is the source compilation unit.
+
+The `.class` files are the compiled representations of individual classes.
+
+They are not the same thing.
+
+---
+
+### 16.2 Why must a public class name match the filename?
+
+Now suppose I write:
+
+```java
+public class Student {
+}
+```
+
+What should the filename be?
+
+```text
+Student.java
+```
+
+Not:
+
+```text
+Main.java
+```
+
+If I save the public class `Student` inside `Main.java` in the normal file-based Java compilation setup, the compiler reports an error similar to:
+
+```text
+class Student is public, should be declared in a file named Student.java
+```
+
+### But why does Java enforce this?
+
+Think about a project containing hundreds of classes.
+
+```text
+src/
+│
+├── Main.java
+├── Student.java
+├── Teacher.java
+├── Employee.java
+├── Vehicle.java
+└── BankAccount.java
+```
+
+Suppose another source file uses `Student`.
+
+```java
+public class Main {
+
+    public static void main(String[] args) {
+
+        Student student = new Student();
+    }
+}
+```
+
+The compiler or Java development tools need to locate the definition of `Student`.
+
+A predictable convention makes this easier:
+
+```text
+Student → Student.java
+```
+
+The public type name and filename have a clear relationship.
+
+This makes source discovery, compilation, navigation, and project organization predictable.
+
+**Important:** This is a source-file naming convention enforced by Java's compilation rules. It is not the JVM's class-loading mechanism. The JVM loads compiled classes using their binary names and class loaders, not by searching for their `.java` filenames.
+
+### Visualise the relationship
+
+```text
+          PUBLIC TOP-LEVEL TYPE
+                  │
+                  ▼
+             Student
+                  │
+                  │ Must match
+                  ▼
+             Student.java
+                  │
+                  │ Compiled by javac
+                  ▼
+             Student.class
+```
+
+---
+
+### 16.3 Why only one public top-level type?
+
+Now consider:
+
+```java
+public class Main {
+}
+
+public class Student {
+}
+```
+
+Both are public top-level classes in the same source file.
+
+In the normal file-based Java compilation setup, this is invalid.
+
+Why?
+
+Because each public top-level type has its own required source filename.
+
+```text
+public class Main     → Main.java
+public class Student  → Student.java
+```
+
+But both are being placed inside:
+
+```text
+Main.java
+```
+
+That conflicts with the public top-level type naming rule.
+
+The correct structure is:
+
+```text
+Project/
+│
+├── Main.java
+│
+└── Student.java
+```
+
+**Main.java**
+
+```java
+public class Main {
+
+    public static void main(String[] args) {
+
+        Student student = new Student();
+        student.display();
+    }
+}
+```
+
+**Student.java**
+
+```java
+public class Student {
+
+    public void display() {
+        System.out.println("Hello Vivek");
+    }
+}
+```
+
+Now each public class has its own correctly named source file.
+
+### Why can non-public classes share a file?
+
+Consider:
+
+```java
+public class Main {
+}
+
+class Student {
+}
+
+class Teacher {
+}
+
+class Employee {
+}
+```
+
+This is valid.
+
+`Student`, `Teacher`, and `Employee` are package-private.
+
+They don't individually need to match the filename.
+
+The compiler can generate:
+
+```text
+Main.class
+Student.class
+Teacher.class
+Employee.class
+```
+
+### Comparison
+
+| Declaration | Allowed together in one source file? |
+|---|---|
+| One public top-level class + package-private classes | Yes |
+| Multiple package-private top-level classes | Yes |
+| Two public top-level classes | No, in normal file-based compilation |
+| One public top-level class + public nested classes | Yes |
+
+A package-private class is accessible to other classes in the same package, not just to classes in the same source file.
+
+---
+
+### 16.4 What happens when the JVM runs these classes?
+
+Consider:
+
+**Main.java**
 
 ```java
 public class Main {
@@ -1537,7 +1914,75 @@ public class Main {
 class Student {
 
     void display() {
-        System.out.println("Student object created");
+        System.out.println("Hello Vivek");
+    }
+}
+```
+
+First compile:
+
+```bash
+javac Main.java
+```
+
+Then run:
+
+```bash
+java Main
+```
+
+The process is roughly:
+
+1. The JVM starts with `Main` as the requested entry class.
+2. The class loader loads `Main.class`.
+3. The JVM verifies and prepares the class.
+4. The JVM initializes the class when required.
+5. The JVM invokes `main()`.
+6. Execution reaches `new Student()`.
+7. The JVM makes the `Student` class available through the class-loading mechanism if it has not already been loaded.
+8. The Student object is created.
+9. Its constructor executes.
+10. `display()` is called.
+
+### Execution flow
+
+```mermaid
+flowchart TD
+    A["java Main"] --> B["JVM starts"]
+    B --> C["Load Main.class"]
+    C --> D["Verify and prepare"]
+    D --> E["Initialize Main"]
+    E --> F["Execute main()"]
+    F --> G["Encounter new Student()"]
+    G --> H["Load Student.class if needed"]
+    H --> I["Create Student object"]
+    I --> J["Call display()"]
+    J --> K["Print Hello Vivek"]
+
+    style B fill:#F1EAFE,stroke:#7652A6,color:#38205E
+    style C fill:#E8F1FF,stroke:#3973C6,color:#17365D
+    style H fill:#E8F1FF,stroke:#3973C6,color:#17365D
+    style I fill:#E9F7EF,stroke:#27834A,color:#14532D
+    style K fill:#E9F7EF,stroke:#27834A,color:#14532D
+```
+
+The JVM doesn't care whether `Main` and `Student` originally came from the same `.java` file.
+
+After compilation, it works with their compiled class representations.
+
+---
+
+### 16.5 What about nested classes?
+
+Consider:
+
+```java
+public class Main {
+
+    public class Student {
+    }
+
+    public class Teacher {
     }
 }
 ```
@@ -1546,208 +1991,142 @@ This is valid.
 
 Why?
 
-Because:
+Because `Student` and `Teacher` are nested classes.
 
-- `Main` is public.
-- `Student` has package-private access.
-- Both are top-level classes.
-- Only one top-level type is public.
+They are not separate top-level types.
 
-### What happens if I make both public?
+I can have multiple public nested classes inside a public top-level class.
 
-```java
-public class Main {
-}
+The same source-file rule also applies to public top-level interfaces, enums, and records, not just classes.
 
-public class Student {
-}
-```
-
-In the normal file-based Java compilation setup, this is invalid if both are declared in the same source file.
-
-The compiler reports an error because multiple public top-level types cannot be declared in one compilation unit.
-
-### File naming rule
-
-If a source file contains a public top-level type, its filename must match that type's name.
-
-For example:
+### Final mental picture
 
 ```text
-Main.java
+                   Main.java
+                       │
+                       ▼
+              ┌───────────────────┐
+              │ Compilation Unit │
+              ├───────────────────┤
+              │ public Main       │
+              │ class Student     │
+              │ class Teacher     │
+              └───────────────────┘
+                       │
+                       ▼
+                  javac compiler
+                       │
+             ┌─────────┼─────────┐
+             ▼         ▼         ▼
+          Main.class Student.class Teacher.class
+             │         │         │
+             └─────────┼─────────┘
+                       ▼
+                      JVM
 ```
 
-```text
-Main.java
-│
-├── public class Main
-│
-└── class Student
-```
+**My takeaway:**
 
-This is valid.
-
-But if I have:
-
-```java
-public class Student {
-}
-
-class Main {
-}
-```
-
-The file should be named:
-
-```text
-Student.java
-```
-
-### Visual understanding
-
-```text
-                  Java Source File
-                     Main.java
-                         │
-                         ▼
-              ┌──────────────────────┐
-              │ Compilation Unit    │
-              ├──────────────────────┤
-              │                      │
-              │  public class Main   │
-              │                      │
-              │  class Student       │
-              │                      │
-              └──────────────────────┘
-                         │
-                         ▼
-             One public top-level type
-             named after the source file
-```
-
-### Important clarification
-
-The rule is about **top-level types**.
-
-A source file can contain:
-
-- One public top-level class, interface, enum, or record.
-- Other package-private top-level types.
-- Nested classes and interfaces inside another type.
-
-Nested classes are not top-level types, so they don't count toward this restriction.
-
-**My takeaway:** In the normal Java source-file setup, I can have multiple top-level types in one file, but at most one can be public, and its name must match the filename.
+- A Java source file can contain multiple top-level types.
+- In normal file-based compilation, at most one top-level type can be public.
+- The public top-level type's name must match the source filename.
+- Package-private top-level types can share the same file.
+- Nested classes don't count as separate top-level types.
+- One `.java` file can generate multiple `.class` files.
+- The JVM loads compiled classes, not Java source files.
 
 ---
 
-# Part 10 — Final Mental Picture
+# PART 9 — Final Mental Model
 
-## 16. Connecting Everything Together
+## 17. Connecting Everything I Learned
 
-Now let's connect all the concepts from this lesson.
+Now the entire lesson should make sense as one connected progression.
 
 ```mermaid
 flowchart TD
     A["Primitive Types"] --> B["Primitive Values"]
-    B --> C["Wrapper Classes"]
-    C --> D["Boxing and Unboxing"]
-    D --> E["AutoBoxing and AutoUnboxing"]
-    E --> F["Collections and Generics"]
+    C["Reference Types"] --> D["References and Objects"]
 
-    C --> G["Integer Objects"]
-    G --> H["Object Identity: =="]
-    G --> I["Logical Equality: .equals()"]
-    G --> J["Integer Caching"]
+    B --> E["Wrapper Classes"]
+    E --> F["Boxing and Unboxing"]
+    F --> G["AutoBoxing and AutoUnboxing"]
+    G --> H["Collections and Generics"]
 
-    K["Abstract Classes"] --> L["Shared State and Behaviour"]
-    M["POJO Classes"] --> N["Represent Application Data"]
-    N --> O["Backend Frameworks"]
+    E --> I["Integer"]
+    I --> J["Object Identity and equals()"]
+    I --> K["Integer Caching"]
+    I --> L["Null During Unboxing"]
 
-    style A fill:#E8F1FF,stroke:#3973C6,color:#17365D
-    style C fill:#E9F7EF,stroke:#27834A,color:#14532D
-    style F fill:#E9F7EF,stroke:#27834A,color:#14532D
-    style J fill:#E9F7EF,stroke:#27834A,color:#14532D
-    style O fill:#E8F1FF,stroke:#3973C6,color:#17365D
+    M["Abstract Classes"] --> N["Shared State and Behaviour"]
+
+    O["POJO Classes"] --> P["Represent Application Data"]
+    P --> Q["Backend Frameworks"]
+
+    R["Java Source Files"] --> S["Compilation Units"]
+    S --> T[".class Files"]
+    T --> U["JVM Class Loading"]
+
+    style E fill:#E9F7EF,stroke:#27834A,color:#14532D
+    style H fill:#E8F1FF,stroke:#3973C6,color:#17365D
+    style K fill:#E8F1FF,stroke:#3973C6,color:#17365D
+    style Q fill:#E9F7EF,stroke:#27834A,color:#14532D
+    style U fill:#E9F7EF,stroke:#27834A,color:#14532D
 ```
 
-### The final things I want to remember
+### What I should remember
 
-| Concept | What I learned |
+| Concept | Main idea |
 |---|---|
 | Primitive Types | Variables hold primitive values |
 | Reference Types | Variables hold references to objects |
 | Wrapper Classes | Represent primitive values as objects |
 | Boxing | Primitive to wrapper object |
 | Unboxing | Wrapper object to primitive |
-| AutoBoxing | Java automatically performs boxing |
-| AutoUnboxing | Java automatically performs unboxing |
-| Collections | Use wrapper types with Generics |
-| Null Unboxing | Can throw `NullPointerException` |
+| AutoBoxing | Automatic boxing |
+| AutoUnboxing | Automatic unboxing |
+| Generics | Require reference types as type arguments |
+| Null Unboxing | Can cause `NullPointerException` |
 | `==` | Compares primitive values or reference identity |
 | `.equals()` | Checks logical equality based on class implementation |
 | Integer Caching | Reuses certain Integer objects |
-| Abstract Class | Provides shared state and behaviour |
+| Abstract Class | Provides shared state and implementation |
 | POJO | Ordinary Java object used to represent data |
-| Public Top-Level Type | Must follow the source-file naming rule |
+| Java Source File | Contains a compilation unit |
+| `.class` File | Contains compiled class representation |
 
 ---
 
-# Practice Questions
+# PART 10 — Test My Understanding
 
-I want to make sure I can explain these concepts without looking at the README.
+Reading the lesson is not enough. I should be able to explain the concepts without looking at the README.
 
-### Conceptual questions
+## A. Conceptual Questions
 
 1. What is the difference between primitive and reference types?
 2. What happens when one reference variable is assigned to another?
-3. Why do Wrapper Classes exist in Java?
-4. What is the difference between Boxing and Unboxing?
-5. What is the difference between AutoBoxing and AutoUnboxing?
-6. Why can I use `ArrayList<Integer>` but not `ArrayList<int>`?
-7. Why does unboxing a `null` Integer cause a `NullPointerException`?
-8. What is the difference between `==` and `.equals()`?
-9. What is Integer Caching?
-10. Why can `Integer a = 100; Integer b = 100;` make `a == b` return `true`?
-11. Is an Abstract Class allowed to have a constructor?
-12. Can an abstract class contain only concrete methods?
-13. What is a POJO?
-14. How can frameworks use POJOs?
-15. Why must a public top-level type follow the Java source filename rule?
+3. Why do Wrapper Classes exist?
+4. Why can't we use primitive types directly with Java Generics?
+5. What is the difference between Boxing and Unboxing?
+6. What is the difference between AutoBoxing and AutoUnboxing?
+7. At which places can Java perform automatic boxing and unboxing?
+8. Why does unboxing a null Integer cause a `NullPointerException`?
+9. What is the difference between `==` and `.equals()`?
+10. What is Integer Caching?
+11. Why can two Integer references containing `100` point to the same object?
+12. Are Integer objects mutable?
+13. Can an Abstract Class have a constructor?
+14. Can an Abstract Class have no abstract methods?
+15. What is a POJO?
+16. How do backend frameworks use POJOs?
+17. What is a top-level class?
+18. Why must a public top-level type match its filename?
+19. Can one Java source file produce multiple `.class` files?
+20. Does the JVM load `.java` files at runtime?
 
-### Code-based questions
+## B. Code-Based Questions
 
-**Q1. What will be the output?**
-
-```java
-Integer a = 100;
-Integer b = 100;
-
-System.out.println(a == b);
-System.out.println(a.equals(b));
-```
-
-**Q2. What will be the output?**
-
-```java
-Integer a = 1000;
-Integer b = 1000;
-
-System.out.println(a == b);
-System.out.println(a.equals(b));
-```
-
-Assume the usual default Integer cache.
-
-**Q3. What happens here?**
-
-```java
-Integer number = null;
-
-int value = number;
-```
-
-**Q4. What will be the output?**
+### Question 1 — Primitive assignment
 
 ```java
 int a = 10;
@@ -1759,11 +2138,12 @@ System.out.println(a);
 System.out.println(b);
 ```
 
-**Q5. What will be the output?**
+What is the output, and why?
+
+### Question 2 — Reference assignment
 
 ```java
 class Student {
-
     String name;
 }
 
@@ -1783,30 +2163,119 @@ public class Main {
 }
 ```
 
-**Q6. Is this code valid? Why or why not?**
+Why does the output show `Rahul`?
+
+### Question 3 — AutoBoxing
+
+```java
+int number = 100;
+
+Integer value = number;
+
+System.out.println(value);
+```
+
+What conversion happens here?
+
+### Question 4 — AutoUnboxing
+
+```java
+Integer number = 200;
+
+int value = number;
+
+System.out.println(value);
+```
+
+What conversion happens here?
+
+### Question 5 — NullPointerException
+
+```java
+Integer number = null;
+
+int value = number;
+```
+
+Why does this compile but fail at runtime?
+
+### Question 6 — Integer Caching
+
+```java
+Integer a = 100;
+Integer b = 100;
+
+System.out.println(a == b);
+System.out.println(a.equals(b));
+```
+
+What are the results, and why?
+
+### Question 7 — Outside the guaranteed cache range
+
+```java
+Integer a = 1000;
+Integer b = 1000;
+
+System.out.println(a == b);
+System.out.println(a.equals(b));
+```
+
+Assuming the usual default Integer cache, what are the results?
+
+### Question 8 — Abstract Classes
+
+Can I create an object of an abstract class directly? Can I create a reference of its type?
+
+Explain with an example.
+
+### Question 9 — POJO
+
+Create a `Student` POJO with:
+
+- `id`
+- `name`
+- `age`
+
+Add a constructor, getters, and setters.
+
+### Question 10 — Java File Structure
+
+Suppose `Main.java` contains:
 
 ```java
 public class Main {
 }
 
-public class Student {
+class Student {
+}
+
+class Teacher {
 }
 ```
+
+How many `.class` files can be generated?
+
+Can I make `Student` public without changing the file structure?
+
+Explain why.
 
 ---
 
 ## Final note to myself
 
-I don't want to remember these concepts only as definitions.
+The most important thing in this lesson is understanding how Java handles values, references, and objects.
 
-I want to remember what happens behind the scenes:
+I should be able to explain:
 
-- Primitive variables hold values.
-- Reference variables hold references to objects.
-- Wrapper classes allow primitive values to work with object-based APIs.
-- AutoBoxing and AutoUnboxing make conversions automatic.
-- Integer caching can cause different `==` results.
-- Abstract classes help share state and implementation.
-- POJOs represent ordinary application data and are widely used in backend development.
+- Why primitive and reference variables behave differently.
+- Why Wrapper Classes are necessary.
+- How Java performs automatic conversions.
+- What happens internally during unboxing.
+- Why `==` and `.equals()` are different.
+- How Integer Caching works.
+- How Abstract Classes provide shared behaviour.
+- Why POJOs are useful in backend development.
+- How Java source files become compiled class files.
 
-If I can explain these things with their memory and execution flow, I have actually understood the lesson rather than just read it.
+If I can explain these concepts with their memory diagrams and execution flows, I haven't just memorised Java syntax. I've understood what is happening behind the code.

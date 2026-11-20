@@ -13,5 +13,6 @@ public class C13_Factorial {
         }
 
         System.out.println("Factorial: " + factorial);
+        sc.close();
     }
 }

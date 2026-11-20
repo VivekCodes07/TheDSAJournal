@@ -19,6 +19,7 @@ public class C16_PowerOfANumber {
         }
 
         System.out.println("Result: " + result);
+        sc.close();
     }
 }
 

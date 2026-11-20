@@ -12,7 +12,7 @@ public class C08_CheckDivisibility {
         } else {
             System.out.println("The number is not divisible.");
         }
-
+        sc.close();
     }
 
 }

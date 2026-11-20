@@ -20,5 +20,6 @@ public class C12_SearchInArray {
                 break;
             }
         }
+        sc.close();
     }
 }

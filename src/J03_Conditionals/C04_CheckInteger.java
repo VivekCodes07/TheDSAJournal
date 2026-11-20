@@ -12,5 +12,6 @@ public class C04_CheckInteger {
         } else {
             System.out.println(number + " is a decimal number (not an integer)");
         }
+        sc.close();
     }
 }

@@ -18,6 +18,7 @@ public class C15_ReverseOfANumber {
         }
 
         System.out.print("Reverse = " + reverse);
+        sc.close();
     }
 }
 

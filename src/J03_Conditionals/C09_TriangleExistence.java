@@ -16,5 +16,6 @@ public class C09_TriangleExistence {
         } else {
             System.out.print("These three can not be sides of a triangle.");
         }
+        sc.close();
     }
 }

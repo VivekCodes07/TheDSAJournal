@@ -13,7 +13,7 @@ public class C01_DefaultValues {
 
         s1.markAttendance();
 
-         int x;
+        // int x;
         // Local variables have no default values, we must initialize it before we use it
         //System.out.println(x); // Error
     }

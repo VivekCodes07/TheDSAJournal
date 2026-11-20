@@ -1,6 +1,5 @@
 package J07_Arrays;
 
-import java.util.Arrays;
 import java.util.Scanner;
 
 public class C11_MultiDimensionalArrays {

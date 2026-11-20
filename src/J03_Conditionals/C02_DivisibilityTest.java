@@ -14,6 +14,6 @@ public class C02_DivisibilityTest {
         } else {
             System.out.println("No, it's not divisible.");
         }
-
+        sc.close();
     }
 }

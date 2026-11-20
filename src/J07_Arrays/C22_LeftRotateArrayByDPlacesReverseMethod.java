@@ -1,7 +1,5 @@
 package J07_Arrays;
 
-import java.lang.reflect.Array;
-import java.util.Arrays;
 import java.util.Scanner;
 
 public class C22_LeftRotateArrayByDPlacesReverseMethod {
@@ -15,10 +13,6 @@ public class C22_LeftRotateArrayByDPlacesReverseMethod {
         int d = sc.nextInt();
         d = d % arr.length;
 
-        int[] tempArr = new int[d];
-
-       
-
-
+        sc.close();
     }
 }

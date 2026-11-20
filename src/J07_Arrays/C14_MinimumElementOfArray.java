@@ -26,6 +26,6 @@ public class C14_MinimumElementOfArray {
         }
 
         System.out.printf("\nMinimum element = %d", min);
-
+        sc.close();
     }
 }

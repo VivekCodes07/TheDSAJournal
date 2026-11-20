@@ -13,5 +13,6 @@ public class C01_EvenOddCheck {
         } else {
             System.out.print("Type: Odd");
         }
+        sc.close();
     }
 }

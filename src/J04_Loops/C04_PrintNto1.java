@@ -9,5 +9,6 @@ public class C04_PrintNto1 {
         for(int i = number; i >= 1; i--) {
             System.out.println(i);
         }
+        sc.close();
     }
 }

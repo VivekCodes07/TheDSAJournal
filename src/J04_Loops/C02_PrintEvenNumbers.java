@@ -15,5 +15,6 @@ public class C02_PrintEvenNumbers {
                 continue;
             }
         }
+        sc.close();
     }
 }

@@ -12,6 +12,7 @@ public class C12_DigitsOfANumber {
 
         if (number == 0) {
             System.out.println("Number of digits: 1");
+            sc.close();
             return;
         }
 

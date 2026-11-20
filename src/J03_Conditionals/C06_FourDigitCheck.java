@@ -12,5 +12,6 @@ public class C06_FourDigitCheck {
         } else {
             System.out.println("The number is not of 4 digit.");
         }
+        sc.close();
     }
 }
