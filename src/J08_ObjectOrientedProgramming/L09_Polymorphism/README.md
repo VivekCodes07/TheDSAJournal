@@ -510,7 +510,7 @@ A safer approach is to use `instanceof`:
 
 ```java
 if (animal instanceof Dog) {
-    Dog dog = (Dog) animal;
+Dog dog = (Dog) animal;
     dog.bark();
 }
 ```
