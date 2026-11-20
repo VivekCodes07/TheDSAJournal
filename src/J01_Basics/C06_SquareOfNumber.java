@@ -6,5 +6,6 @@ public class C06_SquareOfNumber {
         System.out.print("Enter the number whose square you want: ");
         double number = sc.nextInt();
         System.out.println("Square = " + number * number);
+        sc.close();
     }
 }

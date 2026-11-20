@@ -1,3 +1,5 @@
+package J05_PatternPrinting;
+
 import java.util.Scanner;
 
 public class C06_StarTriangle {

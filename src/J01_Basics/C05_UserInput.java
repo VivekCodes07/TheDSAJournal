@@ -10,6 +10,6 @@ public class C05_UserInput {
         double radius = sc.nextInt();
         double area = 3.14159 * radius * radius;
         System.out.println("Area of Circle = " + area + " cm sq.");
-
+        sc.close();
     }
 }

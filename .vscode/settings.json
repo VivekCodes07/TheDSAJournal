@@ -1,0 +1,14 @@
+{
+  "java.project.sourcePaths": [
+    "src"
+  ],
+  "java.project.outputPath": "out/production/TheDSAJournal",
+  "java.autobuild.enabled": true,
+  "java.configuration.updateBuildConfiguration": "automatic",
+  "code-runner.clearPreviousOutput": true,
+  "code-runner.saveAllFilesBeforeRun": true,
+  "code-runner.runInTerminal": true,
+  "code-runner.executorMap": {
+    "java": "cls; [Console]::OutputEncoding = [System.Text.Encoding]::UTF8; javac -encoding UTF-8 -d \"$workspaceRoot/out/production/TheDSAJournal\" -cp \"$workspaceRoot/src\" $fullFileName; if ($?) { $p = (Get-Content $fullFileName -TotalCount 10 | Select-String 'package\\s+([\\w\\.]+);').Matches.Groups[1].Value; $c = if ($p) { \"$p.$fileNameWithoutExt\" } else { \"$fileNameWithoutExt\" }; java \"-Dfile.encoding=UTF-8\" -cp \"$workspaceRoot/out/production/TheDSAJournal\" $c }"
+  }
+}
