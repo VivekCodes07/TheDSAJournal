@@ -1,176 +1,676 @@
-# Mastering Polymorphism in Object-Oriented Programming (OOP)
+# L09 — Polymorphism
 
-## Overview
+## Why am I learning this?
 
-In this lesson, I am learning **Polymorphism**, one of the four core pillars of Object-Oriented Programming.
+Before learning polymorphism, I already understood classes, objects, inheritance, and methods.
 
-The word polymorphism comes from:
+But there was something interesting about inheritance.
 
-```text
-Poly  → Many
-Morph → Forms
-```
+Suppose I have an `Animal` class and a `Dog` class that extends it. Both classes can have a method called `sound()`.
 
-So, polymorphism literally means **"many forms."**
-
-In Java, polymorphism allows the **same method or reference to represent different behaviors** depending on the situation.
-
-The main idea I want to understand is:
-
-```text
-One common method
-       ↓
-Different implementations
-       ↓
-Different behavior
-```
-
-Polymorphism becomes especially powerful when I combine it with **inheritance**, because I can use a parent type to work with different child objects.
-
----
-
-## Learning Objectives
-
-By the end of this lesson, I will be able to:
-
-* **Define** polymorphism and understand why it is useful in OOP.
-* **Differentiate** between compile-time and runtime polymorphism.
-* **Implement** method overloading.
-* **Implement** method overriding.
-* **Understand** how the compiler chooses overloaded methods.
-* **Understand** how the JVM chooses overridden methods at runtime.
-* **Use** parent references with child objects.
-* **Understand** how polymorphism makes code more flexible and extensible.
-
----
-
-## Prerequisites
-
-Before starting this lesson, I should be comfortable with:
-
-* Classes and Objects
-* Constructors
-* `this` keyword
-* Encapsulation
-* Access Modifiers
-* Inheritance
-* `super` keyword
-
-I should already understand the relationship:
-
-```text
-Parent Class
-     ↓
-Child Class
-```
-
-because runtime polymorphism builds directly on inheritance.
-
----
-
-# Lesson Outline
-
-## 1. Introduction to Polymorphism
-
-### What Does Polymorphism Mean?
-
-Polymorphism means **many forms**.
-
-In Java, it allows the same method name or reference to behave differently depending on the context.
-
-For example, suppose I have:
+Now imagine I write:
 
 ```java
-void makeSound()
+Animal animal = new Dog();
+animal.sound();
 ```
 
-A `Dog` can implement it as:
+The reference type is `Animal`, but the actual object is `Dog`.
 
-```text
-makeSound() → Bark
-```
+So which `sound()` method will Java execute?
 
-while a `Cat` can implement it as:
+This is where polymorphism comes into the picture.
 
-```text
-makeSound() → Meow
-```
+Polymorphism allows the same method call or reference to behave differently depending on the situation.
 
-The method name is the same:
+It helps me write flexible and reusable code without repeatedly checking which specific object I am working with.
 
-```text
-makeSound()
-```
+## 1. What exactly is Polymorphism?
 
-but the behavior is different.
+The word Polymorphism comes from two words:
 
-That is the basic idea of polymorphism.
+- Poly = Many
+- Morph = Forms
 
----
+So, polymorphism means **one thing having many forms**.
 
-## Why Do I Need Polymorphism?
+In Java, polymorphism allows the same method name or common parent reference to represent different behaviors.
 
-Without polymorphism, I might need separate methods for every type:
+For example, imagine different animals:
 
 ```java
-dog.bark();
-cat.meow();
-cow.moo();
+class Animal {
+    void sound() {
+        System.out.println("Animal makes a sound");
+    }
+}
+
+class Dog extends Animal {
+    @Override
+    void sound() {
+        System.out.println("Dog barks");
+    }
+}
+
+class Cat extends Animal {
+    @Override
+    void sound() {
+        System.out.println("Cat meows");
+    }
+}
 ```
 
-With polymorphism, I can work with a common parent type:
+Here, all three classes have a method named `sound()`.
 
-```java
-animal.makeSound();
-```
+But the behavior is different:
 
-and let the actual object determine what happens.
+- Animal → Animal makes a sound
+- Dog → Dog barks
+- Cat → Cat meows
 
-This gives me:
+The method call remains the same, but the behavior can change depending on the object.
 
-* Flexibility
-* Reusability
-* Cleaner code
-* Easier maintenance
-* Better extensibility
+This is polymorphism.
 
-The important idea is:
+## 2. Types of Polymorphism in Java
 
-> I can write code around a common type while allowing different objects to provide different behavior.
+Java mainly supports two types of polymorphism:
 
----
+1. Compile-time Polymorphism
+2. Runtime Polymorphism
 
-# 2. Types of Polymorphism in Java
+Let's understand them separately.
 
-In Java, I mainly study two forms of polymorphism:
-
-```text
-                    Polymorphism
-                         |
-              +----------+----------+
-              |                     |
-              ↓                     ↓
-       Compile-Time             Runtime
-       Polymorphism             Polymorphism
-              |                     |
-              ↓                     ↓
-      Method Overloading     Method Overriding
-```
-
----
-
-# 3. Compile-Time Polymorphism
+## 3. Compile-time Polymorphism — Method Overloading
 
 Compile-time polymorphism is achieved through **method overloading**.
 
-### What is Method Overloading?
+Method overloading means creating multiple methods with the same name but different parameter lists inside the same class.
 
-Method overloading means creating multiple methods with:
+The parameters can differ by:
 
-* The same method name
-* Different parameter lists
+- Number of parameters
+- Type of parameters
+- Order of parameter types
+
+Example:
+
+```java
+class Calculator {
+
+    int add(int a, int b) {
+        return a + b;
+    }
+
+    int add(int a, int b, int c) {
+        return a + b + c;
+    }
+
+    double add(double a, double b) {
+        return a + b;
+    }
+}
+```
+
+All three methods have the same name: `add()`.
+
+But their parameters are different.
+
+Now let's call them:
+
+```java
+public class Main {
+    public static void main(String[] args) {
+
+        Calculator calc = new Calculator();
+
+        System.out.println(calc.add(10, 20));
+
+        System.out.println(calc.add(10, 20, 30));
+
+        System.out.println(calc.add(10.5, 20.5));
+    }
+}
+```
+
+Output:
+
+```text
+30
+60
+31.0
+```
+
+### How does Java decide which method to call?
+
+This is the important part.
+
+When Java sees:
+
+```java
+calc.add(10, 20);
+```
+
+The compiler checks the available `add()` methods and their parameter lists.
+
+It finds:
+
+```java
+int add(int a, int b)
+```
+
+So this method is selected.
+
+When Java sees:
+
+```java
+calc.add(10, 20, 30);
+```
+
+It selects:
+
+```java
+int add(int a, int b, int c)
+```
+
+The compiler determines the applicable method during compilation.
+
+That is why it is called compile-time polymorphism.
+
+### Important rule: Return type alone cannot overload a method
+
+This is invalid:
+
+```java
+int calculate(int a, int b) {
+    return a + b;
+}
+
+double calculate(int a, int b) {
+    return a + b;
+}
+```
+
+Why?
+
+Because both methods have exactly the same name and parameter list.
+
+Changing only the return type does not create a valid overloaded method.
+
+### What if I change only the parameter names?
+
+This is also invalid:
+
+```java
+void show(int age) {
+}
+
+void show(int marks) {
+}
+```
+
+Both methods have the same parameter type and count.
+
+Parameter names do not decide overloading.
+
+### What I should remember
+
+Method overloading:
+- Same method name.
+- Different parameter lists.
+- Usually happens within the same class.
+- The compiler selects the applicable overloaded method.
+
+## 4. Runtime Polymorphism — Method Overriding
+
+Runtime polymorphism is achieved through **method overriding**.
+
+Method overriding happens when a child class provides its own implementation of an instance method that it inherits from its parent class.
+
+Let's understand this using inheritance.
+
+```java
+class Animal {
+
+    void sound() {
+        System.out.println("Animal makes a sound");
+    }
+}
+
+class Dog extends Animal {
+
+    @Override
+    void sound() {
+        System.out.println("Dog barks");
+    }
+}
+```
+
+Here:
+
+- `Animal` is the parent class.
+- `Dog` is the child class.
+- Both classes have a method named `sound()`.
+- The child class provides its own implementation of the inherited method.
+
+This is method overriding.
+
+Now let's create an object:
+
+```java
+public class Main {
+
+    public static void main(String[] args) {
+
+        Dog dog = new Dog();
+
+        dog.sound();
+    }
+}
+```
+
+Output:
+
+```text
+Dog barks
+```
+
+The child class implementation is executed instead of the parent class implementation.
+
+But runtime polymorphism becomes more interesting when we use a parent class reference.
+
+## 5. Parent Reference and Child Object
+
+Consider this statement:
+
+```java
+Animal animal = new Dog();
+```
+
+This is one of the most important statements in Java OOP.
+
+Let's break it into two parts.
+
+```java
+Animal animal
+```
+
+This declares a reference variable named `animal` whose reference type is `Animal`.
+
+```java
+new Dog()
+```
+
+This creates an actual `Dog` object.
+
+So we have:
+
+- Reference type = Animal
+- Actual object type = Dog
+
+The reference type and actual object type do not always have to be the same.
+
+This is possible because `Dog` extends `Animal`.
+
+### Complete example
+
+```java
+class Animal {
+
+    void sound() {
+        System.out.println("Animal makes a sound");
+    }
+}
+
+class Dog extends Animal {
+
+    @Override
+    void sound() {
+        System.out.println("Dog barks");
+    }
+}
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Animal animal = new Dog();
+
+        animal.sound();
+    }
+}
+```
+
+Output:
+
+```text
+Dog barks
+```
+
+But why?
+
+The answer is **Dynamic Method Dispatch**.
+
+## 6. Dynamic Method Dispatch
+
+Dynamic Method Dispatch is the mechanism through which Java determines at runtime which overridden method should execute.
+
+Let's understand the execution step by step.
+
+### Step 1 — Object creation
+
+```java
+Animal animal = new Dog();
+```
+
+Java creates a `Dog` object in the heap.
+
+The reference variable `animal` refers to that object.
+
+Conceptually:
+
+```text
+Stack                         Heap
+
+animal ---------------------> Dog Object
+                               |
+                               | sound()
+                               | bark()
+                               |
+```
+
+The actual object is a `Dog`, not an `Animal`.
+
+### Step 2 — Method call
+
+```java
+animal.sound();
+```
+
+Now Java needs to decide which `sound()` implementation should execute.
+
+Two important things happen:
+
+**At compile-time:**
+
+The compiler checks the reference type, which is `Animal`.
+
+It checks whether `sound()` is accessible through the `Animal` reference.
+
+Since `Animal` contains `sound()`, the method call is valid.
+
+**At runtime:**
+
+Java looks at the actual object type.
+
+The actual object is `Dog`.
+
+Since `Dog` overrides `sound()`, Java executes the `Dog` implementation.
+
+Output:
+
+```text
+Dog barks
+```
+
+### The most important distinction
+
+| Compile-time | Runtime |
+|---|---|
+| Reference type matters | Actual object type matters |
+| Checks whether the method can be accessed | Selects the overridden implementation |
+| Animal | Dog |
+
+This is the core idea behind runtime polymorphism.
+
+## 7. Why Can't I Call Every Child Class Method?
+
+This is another important concept.
+
+Consider:
+
+```java
+class Animal {
+
+    void sound() {
+        System.out.println("Animal sound");
+    }
+}
+
+class Dog extends Animal {
+
+    @Override
+    void sound() {
+        System.out.println("Dog barks");
+    }
+
+    void bark() {
+        System.out.println("Barking...");
+    }
+}
+```
+
+Now:
+
+```java
+public class Main {
+
+    public static void main(String[] args) {
+
+        Animal animal = new Dog();
+
+        animal.sound();
+
+        animal.bark();
+    }
+}
+```
+
+This code will not compile.
+
+Why?
+
+Because `animal` is an `Animal` reference.
+
+The compiler checks the members available through the `Animal` class.
+
+`Animal` has `sound()`, but it does not have `bark()`.
+
+Even though the actual object is a `Dog`, the compiler does not allow us to call `bark()` through an `Animal` reference.
+
+This gives me an important rule:
+
+**The reference type determines which members I can access, while the actual object type determines which overridden instance method executes.**
+
+### Can I access the child-specific method?
+
+Yes, by using type casting:
+
+```java
+Animal animal = new Dog();
+
+Dog dog = (Dog) animal;
+
+dog.bark();
+```
+
+Output:
+
+```text
+Barking...
+```
+
+Here, we explicitly cast the reference to `Dog`.
+
+But I must be careful.
+
+If the actual object is not a `Dog`, this cast can throw a `ClassCastException` at runtime.
+
+A safer approach is to use `instanceof`:
+
+```java
+if (animal instanceof Dog) {
+    Dog dog = (Dog) animal;
+    dog.bark();
+}
+```
+
+## 8. One Parent Reference, Multiple Child Objects
+
+Now let's understand why runtime polymorphism is useful.
+
+```java
+class Animal {
+
+    void sound() {
+        System.out.println("Animal sound");
+    }
+}
+
+class Dog extends Animal {
+
+    @Override
+    void sound() {
+        System.out.println("Dog barks");
+    }
+}
+
+class Cat extends Animal {
+
+    @Override
+    void sound() {
+        System.out.println("Cat meows");
+    }
+}
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Animal animal;
+
+        animal = new Dog();
+        animal.sound();
+
+        animal = new Cat();
+        animal.sound();
+
+        animal = new Animal();
+        animal.sound();
+    }
+}
+```
+
+Output:
+
+```text
+Dog barks
+Cat meows
+Animal sound
+```
+
+Notice something:
+
+I created only one reference variable:
+
+```java
+Animal animal;
+```
+
+But that reference can point to different compatible objects at different times.
+
+First, it refers to a `Dog` object.
+
+Then, it refers to a `Cat` object.
+
+Finally, it refers to an `Animal` object.
+
+The same method call:
+
+```java
+animal.sound();
+```
+
+produces different behavior depending on the actual object.
+
+This is runtime polymorphism in its clearest form.
+
+## 9. Polymorphism with Methods and Arrays
+
+Polymorphism becomes especially useful when I have multiple objects that share a common parent class.
 
 For example:
+
+```java
+class Animal {
+
+    void sound() {
+        System.out.println("Animal sound");
+    }
+}
+
+class Dog extends Animal {
+
+    @Override
+    void sound() {
+        System.out.println("Dog barks");
+    }
+}
+
+class Cat extends Animal {
+
+    @Override
+    void sound() {
+        System.out.println("Cat meows");
+    }
+}
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Animal[] animals = {
+            new Dog(),
+            new Cat(),
+            new Animal()
+        };
+
+        for (Animal animal : animals) {
+            animal.sound();
+        }
+    }
+}
+```
+
+Output:
+
+```text
+Dog barks
+Cat meows
+Animal sound
+```
+
+I can store different child objects inside an array of their common parent type.
+
+Then I can process all of them using the same loop.
+
+I don't need separate loops for `Dog`, `Cat`, and `Animal`.
+
+This is one practical advantage of polymorphism.
+
+## 10. Method Overloading vs Method Overriding
+
+I should never confuse these two concepts.
+
+| Method Overloading | Method Overriding |
+|---|---|
+| Same method name, different parameters | Child class redefines inherited method |
+| Usually within the same class | Requires inheritance |
+| Compile-time polymorphism | Runtime polymorphism |
+| Compiler selects the applicable overload | Runtime dispatch selects overridden implementation |
+| Return type alone cannot distinguish overloads | Return type must be compatible with the overridden method |
+
+Example of overloading:
 
 ```java
 class Calculator {
@@ -185,589 +685,456 @@ class Calculator {
 }
 ```
 
-Both methods are called:
-
-```text
-add()
-```
-
-but their parameter lists are different:
-
-```text
-add(int, int)
-
-add(int, int, int)
-```
-
-Now I can call:
+Example of overriding:
 
 ```java
-Calculator calculator = new Calculator();
+class Parent {
 
-calculator.add(10, 20);
-
-calculator.add(10, 20, 30);
-```
-
-The compiler can look at the arguments and determine which `add()` method should be used.
-
-That's why this is called:
-
-**Compile-Time Polymorphism**
-
-or
-
-**Static Polymorphism**
-
----
-
-## What Can Change in Method Overloading?
-
-The parameter list can differ by:
-
-### Number of Parameters
-
-```java
-add(int a, int b)
-
-add(int a, int b, int c)
-```
-
-### Type of Parameters
-
-```java
-add(int a, int b)
-
-add(double a, double b)
-```
-
-### Order of Parameters
-
-```java
-display(String name, int age)
-
-display(int age, String name)
-```
-
----
-
-## Important Rule
-
-I cannot overload a method by changing only its return type.
-
-This is invalid:
-
-```java
-int add(int a, int b) {
-    return a + b;
+    void show() {
+        System.out.println("Parent");
+    }
 }
 
-double add(int a, int b) {
-    return a + b;
+class Child extends Parent {
+
+    @Override
+    void show() {
+        System.out.println("Child");
+    }
 }
 ```
 
-The parameter list is exactly the same.
+## 11. Important Rules of Method Overriding
 
-The compiler cannot distinguish the methods just because their return types are different.
+I need to remember these rules:
 
----
+1. The child class must inherit the method from the parent class.
+2. The method name and parameter list must match.
+3. The return type must be the same or a compatible covariant return type.
+4. The child class cannot reduce the visibility of the overridden method.
+5. `private` methods cannot be overridden because they are not inherited.
+6. `final` methods cannot be overridden.
+7. `static` methods are hidden, not overridden.
+8. Constructors cannot be overridden.
+9. The `@Override` annotation helps the compiler verify that I am actually overriding a method.
 
-# 4. Runtime Polymorphism
-
-Runtime polymorphism is achieved through **method overriding**.
-
-### What is Method Overriding?
-
-Method overriding happens when a child class provides its own implementation of a method that already exists in the parent class.
-
-For example:
+### What is `@Override`?
 
 ```java
 class Animal {
 
-    void makeSound() {
-        System.out.println("Animal makes a sound.");
+    void sound() {
+        System.out.println("Animal sound");
     }
 }
 
 class Dog extends Animal {
 
     @Override
-    void makeSound() {
-        System.out.println("Dog barks.");
+    void sound() {
+        System.out.println("Dog barks");
     }
 }
 ```
 
-Here, `Dog` inherits `makeSound()` from `Animal`, but provides its own implementation.
+`@Override` tells the compiler that I intend to override an inherited method.
 
-So:
+If I accidentally write a different method signature, the compiler will report an error instead of silently treating it as an ordinary new method.
 
-```text
-Animal
-   |
-   ↓
-makeSound()
-   |
-   ↓
-Dog overrides it
-```
+## 12. Special Case — Static Methods and Method Hiding
 
-Now:
+Static methods belong to the class rather than individual objects.
+
+They are not overridden in the runtime-polymorphism sense.
+
+Example:
 
 ```java
-Dog dog = new Dog();
+class Parent {
 
-dog.makeSound();
+    static void show() {
+        System.out.println("Parent static method");
+    }
+}
+
+class Child extends Parent {
+
+    static void show() {
+        System.out.println("Child static method");
+    }
+}
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Parent obj = new Child();
+
+        obj.show();
+    }
+}
 ```
 
 Output:
 
 ```text
-Dog barks.
+Parent static method
 ```
 
----
+Why?
 
-# 5. Parent Reference + Child Object
+Because static method calls are resolved using the reference type in this example.
 
-This is one of the most important concepts in runtime polymorphism.
+This is called **Method Hiding**, not method overriding.
 
-I can write:
+In real code, it is better to call static methods using the class name:
 
 ```java
-Animal animal = new Dog();
+Parent.show();
+Child.show();
 ```
 
-At first, this might look confusing.
+## 13. Special Case — Fields Are Not Polymorphic
 
-There are two different things here:
-
-```text
-Reference Type → Animal
-Actual Object  → Dog
-```
-
-The reference is an `Animal` reference:
-
-```text
-Animal animal
-```
-
-but the object created in memory is a `Dog`:
-
-```text
-new Dog()
-```
-
-So:
-
-```java
-animal.makeSound();
-```
-
-calls:
-
-```text
-Dog's makeSound()
-```
-
-even though the reference type is `Animal`.
-
-This is runtime polymorphism.
-
----
-
-# 6. How Runtime Polymorphism Works
-
-I can visualize it like this:
-
-```text
-Animal animal = new Dog();
-        |
-        ↓
-Reference points to
-        |
-        ↓
-Dog object
-        |
-        ↓
-animal.makeSound()
-        |
-        ↓
-Dog's overridden makeSound()
-        |
-        ↓
-"Dog barks."
-```
-
-The important point is that the **actual object** determines which overridden method runs.
-
-The decision happens at runtime.
-
-This is also called:
-
-**Dynamic Method Dispatch**
-
-or
-
-**Dynamic Binding**
-
----
-
-# 7. Compile-Time vs Runtime Polymorphism
-
-| Compile-Time Polymorphism       | Runtime Polymorphism              |
-| ------------------------------- | --------------------------------- |
-| Method Overloading              | Method Overriding                 |
-| Same method name                | Same method signature             |
-| Different parameters            | Child provides new implementation |
-| Compiler decides                | JVM decides at runtime            |
-| Does not require inheritance    | Requires inheritance              |
-| Also called static polymorphism | Also called dynamic polymorphism  |
-
----
-
-# 8. Polymorphism with Multiple Child Classes
-
-Suppose I have:
-
-```text
-              Animal
-             /      \
-            ↓        ↓
-          Dog        Cat
-```
-
-The parent has:
-
-```java
-void makeSound()
-```
-
-The children provide different implementations:
-
-```text
-Dog
- ↓
-Bark
-
-Cat
- ↓
-Meow
-```
-
-Now I can write:
-
-```java
-Animal dog = new Dog();
-Animal cat = new Cat();
-
-dog.makeSound();
-cat.makeSound();
-```
-
-The method call is the same:
-
-```java
-makeSound()
-```
-
-but the behavior is different.
-
-```text
-dog.makeSound()
-      ↓
-   Bark
-
-
-cat.makeSound()
-      ↓
-   Meow
-```
-
-This is where polymorphism becomes really useful.
-
----
-
-# 9. Memory POV
-
-Consider:
-
-```java
-Animal animal = new Dog();
-```
-
-I should separate the **reference** from the **object**.
-
-Conceptually:
-
-```text
-Stack                         Heap
-
-animal ───────────────────→ Dog Object
-                              |
-                              ├── Animal state
-                              |
-                              └── Dog state
-```
-
-The variable `animal` stores a reference.
-
-The actual `Dog` object exists in the heap.
-
-When I call:
-
-```java
-animal.makeSound();
-```
-
-Java follows the reference to the actual object.
-
-The actual object is a `Dog`.
-
-Therefore, the overridden `Dog.makeSound()` implementation runs.
-
-```text
-animal.makeSound()
-        ↓
-Actual object = Dog
-        ↓
-Dog.makeSound()
-        ↓
-"Dog barks."
-```
-
-This is the key memory and runtime flow I need to understand.
-
----
-
-# 10. The Core Mental Model
-
-I can remember polymorphism using two simple patterns.
-
-### Compile-Time Polymorphism
-
-```text
-Same method name
-       ↓
-Different parameters
-       ↓
-Compiler decides
-```
+Method overriding and field access behave differently.
 
 Example:
 
-```text
-add(int, int)
+```java
+class Parent {
 
-add(int, int, int)
+    int value = 10;
+}
+
+class Child extends Parent {
+
+    int value = 20;
+}
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Parent obj = new Child();
+
+        System.out.println(obj.value);
+    }
+}
+```
+
+Output:
+
+```text
+10
+```
+
+Even though the actual object is `Child`, the field is accessed using the reference type.
+
+Fields are hidden, not overridden.
+
+This is why I should not apply the dynamic method dispatch rule to fields.
+
+## 14. Using `super` in Overridden Methods
+
+Sometimes I want the child class to perform its own behavior while also calling the parent class implementation.
+
+I can use `super`.
+
+```java
+class Animal {
+
+    void sound() {
+        System.out.println("Animal makes a sound");
+    }
+}
+
+class Dog extends Animal {
+
+    @Override
+    void sound() {
+
+        super.sound();
+
+        System.out.println("Dog barks");
+    }
+}
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Dog dog = new Dog();
+
+        dog.sound();
+    }
+}
+```
+
+Output:
+
+```text
+Animal makes a sound
+Dog barks
+```
+
+`super.sound()` explicitly calls the parent class implementation.
+
+## 15. Real-World Use of Polymorphism
+
+Imagine I am building a payment application.
+
+Different payment methods have different implementations:
+
+- UPI payment
+- Credit card payment
+- Net banking payment
+
+But all of them perform a common operation: `pay()`.
+
+```java
+class Payment {
+
+    void pay() {
+        System.out.println("Processing payment");
+    }
+}
+
+class UpiPayment extends Payment {
+
+    @Override
+    void pay() {
+        System.out.println("Payment through UPI");
+    }
+}
+
+class CardPayment extends Payment {
+
+    @Override
+    void pay() {
+        System.out.println("Payment through Card");
+    }
+}
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Payment payment;
+
+        payment = new UpiPayment();
+        payment.pay();
+
+        payment = new CardPayment();
+        payment.pay();
+    }
+}
+```
+
+Output:
+
+```text
+Payment through UPI
+Payment through Card
+```
+
+The main code doesn't need to know the internal implementation of every payment method.
+
+It works with a common parent type.
+
+In a real payment system, I would often use an interface such as `PaymentMethod` instead of a concrete parent class. The polymorphism concept remains the same.
+
+## 16. Final Mental Picture
+
+There are two important ideas I should remember.
+
+### Compile-time Polymorphism
+
+```text
+Same method name
+       |
+Different parameters
+       |
+Compiler selects applicable method
+       |
+Method Overloading
 ```
 
 ### Runtime Polymorphism
 
 ```text
-Parent reference
-       +
-Child object
-       ↓
-Overridden method
-       ↓
-JVM decides at runtime
+Parent Reference
+       |
+       v
+Child Object
+       |
+       v
+Overridden Method Call
+       |
+       v
+JVM selects implementation
+       |
+       v
+Child Class Method Executes
 ```
 
-Example:
+The most important statement in this entire lesson is:
 
 ```java
 Animal animal = new Dog();
-
-animal.makeSound();
+animal.sound();
 ```
+
+- `Animal` determines which members are accessible through the reference.
+- `Dog` determines which overridden instance method executes at runtime.
+
+That is the foundation of runtime polymorphism in Java.
+
+## 17. Common Mistakes I Should Avoid
+
+1. Thinking that method overloading and overriding are the same.
+2. Thinking that the reference type and actual object type must always match.
+3. Assuming that a parent reference can directly access every child-specific method.
+4. Assuming that all methods are selected at runtime.
+5. Thinking that static methods are overridden.
+6. Thinking that fields use dynamic method dispatch.
+7. Forgetting that constructors cannot be overridden.
+8. Forgetting to use `@Override` when overriding methods.
+
+## 18. What I Should Be Able to Explain After This Lesson
+
+- What is polymorphism and why do we need it?
+- What are the two types of polymorphism in Java?
+- What is method overloading?
+- What is method overriding?
+- What is the difference between overloading and overriding?
+- What is runtime polymorphism?
+- What is Dynamic Method Dispatch?
+- What is the difference between reference type and actual object type?
+- Why can a parent reference point to a child object?
+- Why can't a parent reference access child-specific methods?
+- What is method hiding?
+- Why are fields not polymorphic?
+- What is the use of `super` in an overridden method?
+- What is the role of `@Override`?
+
+## 19. Practice Questions
+
+### Conceptual Questions
+
+1. Define polymorphism with an example.
+2. Explain compile-time and runtime polymorphism.
+3. Explain method overloading with a Java program.
+4. Explain method overriding with a Java program.
+5. What is Dynamic Method Dispatch?
+6. Differentiate between method overloading and method overriding.
+7. Explain the difference between reference type and actual object type.
+8. Can a parent class reference point to a child class object? Explain.
+9. Can static methods be overridden? Explain method hiding.
+10. Why can't constructors be overridden?
+
+### Output-Based Questions
+
+**Question 1**
+
+```java
+class A {
+
+    void show() {
+        System.out.println("A");
+    }
+}
+
+class B extends A {
+
+    @Override
+    void show() {
+        System.out.println("B");
+    }
+}
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        A obj = new B();
+
+        obj.show();
+    }
+}
+```
+
+Predict the output and explain why.
+
+**Question 2**
+
+```java
+class Calculator {
+
+    void add(int a, int b) {
+        System.out.println(a + b);
+    }
+
+    void add(double a, double b) {
+        System.out.println(a + b);
+    }
+}
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Calculator c = new Calculator();
+
+        c.add(10, 20);
+        c.add(10.5, 20.5);
+    }
+}
+```
+
+Predict the output. Which methods are selected?
+
+**Question 3**
+
+```java
+class Parent {
+
+    int value = 10;
+
+    void show() {
+        System.out.println("Parent");
+    }
+}
+
+class Child extends Parent {
+
+    int value = 20;
+
+    @Override
+    void show() {
+        System.out.println("Child");
+    }
+}
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Parent obj = new Child();
+
+        System.out.println(obj.value);
+        obj.show();
+    }
+}
+```
+
+Predict both outputs and explain why the field and method behave differently.
 
 ---
 
-# Practice Exercises
+## Final takeaway
 
-## Exercise 1 — Payment Gateway System
+Polymorphism is not just about having multiple methods with the same name.
 
-Create a parent class:
+It is about writing code that can work with a common type while allowing different objects to provide their own behavior.
 
-```java
-PaymentProcessor
-```
-
-with a method:
-
-```java
-processPayment(double amount)
-```
-
-Create two child classes:
-
-```text
-CreditCardPayment
-PayPalPayment
-```
-
-Override `processPayment()` in both classes.
-
-Then create:
-
-```java
-PaymentProcessor payment = new CreditCardPayment();
-```
-
-and:
-
-```java
-PaymentProcessor payment = new PayPalPayment();
-```
-
-Call:
-
-```java
-payment.processPayment(5000);
-```
-
-Observe how the same method call produces different behavior.
-
----
-
-## Exercise 2 — Shape Calculator
-
-Create a class:
-
-```java
-ShapeArea
-```
-
-Create overloaded methods called:
-
-```java
-calculateArea()
-```
-
-For example:
-
-```text
-calculateArea(double radius)
-calculateArea(double length, double width)
-```
-
-Use them to calculate:
-
-* Circle area
-* Rectangle area
-
-Observe how the compiler selects the appropriate method based on the parameters.
-
----
-
-# Common Mistakes I Should Avoid
-
-### Mistake 1: Thinking Overloading and Overriding Are the Same
-
-They are different.
-
-```text
-Overloading
-    ↓
-Same class
-    ↓
-Different parameters
-```
-
-```text
-Overriding
-    ↓
-Parent + Child
-    ↓
-Same method signature
-    ↓
-Different implementation
-```
-
-### Mistake 2: Thinking Return Type Creates Overloading
-
-It doesn't.
-
-The parameter list must be different.
-
-### Mistake 3: Confusing Reference Type with Object Type
-
-In:
-
-```java
-Animal animal = new Dog();
-```
-
-remember:
-
-```text
-Reference Type → Animal
-Object Type    → Dog
-```
-
-### Mistake 4: Thinking the Reference Type Always Determines the Method
-
-For overridden instance methods, the actual object determines the implementation at runtime.
-
----
-
-# Key Takeaways
-
-* **Polymorphism** means many forms.
-* It allows the same method or reference to represent different behaviors.
-* Java mainly has:
-
-    * Compile-time polymorphism
-    * Runtime polymorphism
-* **Method overloading** gives compile-time polymorphism.
-* **Method overriding** gives runtime polymorphism.
-* Overloading requires different parameter lists.
-* Overriding happens between a parent and child class.
-* Runtime polymorphism commonly uses a **parent reference pointing to a child object**.
-* The actual object determines which overridden method executes.
-* Polymorphism makes code more flexible, reusable, and easier to extend.
-
-The biggest idea I want to remember is:
-
-```text
-                POLYMORPHISM
-                     |
-              "Many Forms"
-                     |
-          +----------+----------+
-          |                     |
-          ↓                     ↓
-   Compile-Time             Runtime
-          |                     |
-          ↓                     ↓
-    Overloading             Overriding
-          |                     |
-          ↓                     ↓
-  Compiler decides        JVM decides
-                                |
-                                ↓
-                     Parent reference
-                              +
-                        Child object
-                                |
-                                ↓
-                       Different behavior
-```
-
-## Lesson Files
-
-```text
-L09_Polymorphism/
-│
-├── README.md
-├── C01_MethodOverloading.java
-└── C02_MethodOverriding.java
-```
-
-In `C01_MethodOverloading.java`, I will focus on **compile-time polymorphism and method overloading**.
-
-In `C02_MethodOverriding.java`, I will focus on **runtime polymorphism, method overriding, parent references, and child objects**.
+**One common reference, multiple possible implementations, and behavior selected according to the actual object at runtime.**
